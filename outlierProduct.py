@@ -71,6 +71,6 @@ class outlierProduct(object):
 			if pricechange:
 				if int(pricechange) != int(color['price']):
 					self.output.telegramPriceNotification(self.product_id, self.name, color['color'], pricechange, color['price'], color['sizes'])
-			sizechange = self.output.addProductColorSizes(self.product_id, color_key, color['sizes'])
+			sizechange = self.output.addProductColorSizes(self, color_key, color['sizes'])
 
 

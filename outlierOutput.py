@@ -11,9 +11,7 @@ class outlierOutput(object):
 		self.telegram_offset = self.getTelegramOffset()
 		self.telegram_users = self.fetchTelegramUsers()
 		self.telegram_user = "111127184"
-		print "Telegram Users"
-		print self.telegram_users
-		self.bot = telepot.Bot('438558984:AAHbJtczAw5W7qx7cS67969RE0VSRhqm5Sc')
+		self.bot = telepot.Bot('')
 		self.readTelegramMessages()
 	def __del__(self):
 		self.conn.close()
@@ -79,36 +77,47 @@ class outlierOutput(object):
 			return False
 
 	def addProduct(self, product):
-		query = 'INSERT INTO product (product_id, product_name, introduction, URL) VALUES({id}, "{name}", {ts}, "{url})"'.format(id=product.product_id, name = product.name, ts = time.time(), url=product.url)
+		query = 'INSERT INTO product (product_id, product_name, introduction, URL) VALUES({id}, "{name}", {ts}, "{url}")'.format(id=product.product_id, name = product.name, ts = time.time(), url=product.url)
 		try:
 			self.cursor.execute(query)
 			self.conn.commit()
-			self.telegram.telegramProductNotification(product_id, product_name)
+			self.telegramProductNotification(product.product_id, product.name)
 		except Exception as e: 
-			print query
-			print e
+			pass
 	def checkProductColorSizes(self, product_color_id, sizes):
 		query = 'SELECT sizes FROM product_color_size WHERE product_color_id = {pcid} ORDER BY timestamp DESC'.format(pcid=product_color_id)
 		self.cursor.execute(query)
 		result = self.cursor.fetchone()
-		if result and cPickle.loads(str(result[0])) == sizes:
-			return True
+		if result: 
+			if cPickle.loads(str(result[0])) == sizes:
+				return False
+			else: 
+				return [[item for item in sizes if item not in cPickle.loads(str(result[0]))], [item for item in cPickle.loads(str(result[0])) if item not in sizes]]
 		else: 
-			return False
+			return [sizes, []]
 
-	def addProductColorSizes(self, product_id, color_id, sizes):
-		product_color_id = self.getProductColorId(product_id, color_id)
+	def addProductColorSizes(self, product, color_id, sizes):
+		product_color_id = self.getProductColorId(product.product_id, color_id)
 		if not product_color_id: 
 			return False
-		if not self.checkProductColorSizes(product_color_id, sizes):
+		sizeDifference = self.checkProductColorSizes(product_color_id, sizes)
+
+		if sizeDifference is not False:
 			query = 'INSERT INTO product_color_size (product_color_id, sizes, timestamp) VALUES ({pcid}, "{sizes}", {ts})'.format(pcid=product_color_id, sizes=cPickle.dumps(sizes), ts=time.time())
 			try: 
 				self.cursor.execute(query)
-				return True
 			except Exception as e:
-				print query
-				print e
 				return False
+			self.conn.commit()
+			self.telegramSizeNotification(product, color_id, sizeDifference)
+			return True
+			
+
+	def telegramSizeNotification(self, product, color_id, sizeDifference):
+		if sizeDifference[0] != []:
+			self.bot.sendMessage(self.telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference[0]))
+		if sizeDifference[1] != []:
+			self.bot.sendMessage(self.telegram_user, "Size Sold Out!!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference[1]))
 	"""
 	def findProductColor(self, color_id, product_id):
 		query = 'SELECT color_id, product_id FROM product_color WHERE color_id = {color_id} AND product_id = {product_id}'.format(color_id=color_id, product_id=product_id)
@@ -126,16 +135,14 @@ class outlierOutput(object):
 				self.cursor.execute(query)
 				self.conn.commit()
 			except Exception as e: 
-				print query
-				print e
-
+				pass
 	def addColor(self, color_id, color_name):
 		query = 'INSERT INTO color (color_id, color_name) VALUES ({id}, "{name}")'.format(id=color_id, name=color_name)
 		try: 
 			self.cursor.execute(query)
 			self.conn.commit()
 		except Exception as e: 
-			print e
+			pass
 
 	def getProductColorId(self, product_id, color_id):
 		query = "SELECT product_color_id FROM product_color WHERE product_id = {pid} AND color_id = {cid}".format(pid=product_id, cid=color_id)
@@ -156,7 +163,7 @@ class outlierOutput(object):
 				try: 
 					self.cursor.execute(query)
 				except Exception as e: 
-					print e
+					pass
 			self.conn.commit()
 			if oldprice:
 				return oldprice[0]

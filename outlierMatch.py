@@ -3,7 +3,7 @@ class outlierMatch(object):
 	def __init__(self, page):
 		self.page = page
 		self.patterns = {}
-		self.patterns["color"] = "^data-color\=\"([0-9]*).*item-color\">([A-Za-z\ ]+)"
+		self.patterns["color"] = "^data-color\=\"([0-9]*).*item-color\">([A-Za-z\ \(\_)]+)"
 		self.patterns["name"] = "\<h1\>(.*)\<\/h1\>"
 		self.patterns["product_id"] = "<input type=\"hidden\" name=\"product\" value=\"([0-9]*)\""
 		self.patterns["price"] = "setOption\(.*?,.*?,([0-9]+),.*?,.*?,'\$([0-9]+)"

@@ -8,6 +8,9 @@ class outlierProduct(object):
 		self.minPrice = 0
 		self.maxPrice = 0
 		self.output = output
+		self.new = False
+		self.story = ""
+		self.description = ""
 
 	def setProductId(self, product_id):
 		if product_id:
@@ -40,6 +43,9 @@ class outlierProduct(object):
 		else: 
 			self.setColor(color_key, color_name)
 
+	def addStory(self, story):
+		self.story = story
+
 	def setColor(self, color_key, color_name):
 		self.color_size_price[color_key]["color"] = color_name
 
@@ -56,6 +62,9 @@ class outlierProduct(object):
 			self.addColor(color_key, "")
 		self.color_size_price[color_key]["price"] = price
 		self.minMaxPrice(price)
+
+	def setDescription(self, description):
+		self.description = description
 	
 	def minMaxPrice(self, price):
 		if int(price) > self.maxPrice:

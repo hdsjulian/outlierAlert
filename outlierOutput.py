@@ -5,24 +5,40 @@ import telepot
 from pprint import pprint
 class outlierOutput(object):
 	def __init__(self):
-		self.sqlite_file = "/Users/Julian/Work/outlier.sqlite"
+		self.sqlite_file = "outlier.sqlite"
 		self.conn = sqlite3.connect(self.sqlite_file)
 		self.cursor = (self.conn.cursor())
 		self.telegram_offset = self.getTelegramOffset()
 		self.telegram_users = self.fetchTelegramUsers()
-		self.telegram_user = "111127184"
 		self.bot = telepot.Bot('')
 		self.readTelegramMessages()
 	def __del__(self):
 		self.conn.close()
 
+	def getProducts(self):
+		query = "SELECT product_id, url FROM product"
+		self.cursor.execute(query)
+		products = []
+		for line in self.cursor.fetchall():
+			print "product_id = "+str(line[0])
+			products.append({'product_id':line[0], 'url':line[1]})
+		return products
+
+
+
 	def readTelegramMessages(self):
 		response = self.bot.getUpdates(offset=self.telegram_offset)
 		offset = self.telegram_offset
 		for message in response:
+			if 'message' not in message.iterkeys():
+				continue
+			print message
 			offset = int(message['update_id'])
 			user_id = int(message['message']['chat']['id'])
-			user_name = message['message']['chat']['username']
+			if 'username' in message['message']['chat'].keys():
+				user_name = message['message']['chat']['username']
+			else:
+				user_name = message['message']['chat']['first_name']+' '+message['message']['chat']['last_name']
 
 			if message['message']['text'] == "/subscribe":
 				if user_id not in self.telegram_users:
@@ -77,11 +93,12 @@ class outlierOutput(object):
 			return False
 
 	def addProduct(self, product):
-		query = 'INSERT INTO product (product_id, product_name, introduction, URL) VALUES({id}, "{name}", {ts}, "{url}")'.format(id=product.product_id, name = product.name, ts = time.time(), url=product.url)
+		query = 'INSERT INTO product (product_id, product_name, introduction, URL, story, description) VALUES({id}, "{name}", {ts}, "{url}", "{story}", "{desc}")'.format(id=product.product_id, name = product.name, ts = time.time(), url=product.url, story=product.story, desc=product.description)
 		try:
 			self.cursor.execute(query)
 			self.conn.commit()
-			self.telegramProductNotification(product.product_id, product.name)
+			product.new = True
+			self.telegramProductNotification(product)
 		except Exception as e: 
 			pass
 	def checkProductColorSizes(self, product_color_id, sizes):
@@ -112,22 +129,6 @@ class outlierOutput(object):
 			self.telegramSizeNotification(product, color_id, sizeDifference)
 			return True
 			
-
-	def telegramSizeNotification(self, product, color_id, sizeDifference):
-		if sizeDifference[0] != []:
-			self.bot.sendMessage(self.telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference[0]))
-		if sizeDifference[1] != []:
-			self.bot.sendMessage(self.telegram_user, "Size Sold Out!!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference[1]))
-	"""
-	def findProductColor(self, color_id, product_id):
-		query = 'SELECT color_id, product_id FROM product_color WHERE color_id = {color_id} AND product_id = {product_id}'.format(color_id=color_id, product_id=product_id)
-		self.cursor.execute(query)
-
-		if self.cursor.fetchone():
-			return True
-		else:
-			return False
-	"""
 	def addProductColor(self, color_id, product_id):
 		if not self.getProductColorId(product_id, color_id):
 			query = 'INSERT INTO product_color (color_id, product_id, introduction) VALUES({color_id}, {product_id}, {introduction})'.format(color_id=color_id, product_id=product_id, introduction=time.time())
@@ -177,10 +178,21 @@ class outlierOutput(object):
 			price_message = "Price Drop!"
 		else: 
 			price_message = "Price Change!"
-		self.bot.sendMessage(self.telegram_user, price_message+'\nObject: '+product_name+"\nProductID"+str(product_id)+"\nColor: "+color_name+"\nSizes: "+", ".join(sizes)+"\nPrice: "+str(newprice)+"instead of "+str(oldprice))
+		for telegram_user in self.telegram_users:
+			self.bot.sendMessage(telegram_user, price_message+'\nObject: '+product_name+"\nProductID"+str(product_id)+"\nColor: "+color_name+"\nSizes: "+", ".join(sizes)+"\nPrice: "+str(newprice)+"instead of "+str(oldprice))
 	
-	def telegramProductNotification(self, product_id, product_name):
-		for user in self.telegram_users:
-			self.bot.sendMessage(user, "New Product!\nProduct ID:"+str(product_id)+"\nProduct Name: "+product_name)
+	def telegramProductNotification(self, product):
+		color_size_price_string = ""
+		for v in product.color_size_price.itervalues():
+			color_size_price_string = color_size_price_string+"\nColor: "+v['color']+"\nPrice: "+v['price']+"\nSizes: "+', '.join(v["sizes"])
+		for telegram_user in self.telegram_users:
+			self.bot.sendMessage(user, "New Product!\nProduct ID:"+str(product.product_id)+"\nProduct Name: "+product.name+"\nDescription:\n"+product.description+"\n"+color_size_price_string)
 
-
+	def telegramSizeNotification(self, product, color_id, sizeDifference):
+		if product.new is False:
+			if sizeDifference[0] != []:
+				for telegram_user in self.telegram_users:
+					self.bot.sendMessage(self.telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference[0]))
+			if sizeDifference[1] != []:
+				#self.bot.sendMessage(self.telegram_user, "Size Sold Out!!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference[1]))
+				pass

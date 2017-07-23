@@ -37,14 +37,14 @@ class outlierURLs(object):
 			'frequency': 600
 		}
 
-	def checkSchedule(self, last_time):
+	def checkSchedule(self, lasttime):
 		now = localtime()
 		actionlist = []
 		frequency = 1000
 		for scheduletype, scheduledata in self.schedule.iteritems():
 
 			frequency = scheduledata['frequency'] if frequency > scheduledata['frequency'] else frequency
-			if strftime('%a', now) in scheduledata['day_of_week'] and int(strftime('%H', now)) > scheduledata['time_begin'] and int(strftime('%H', now)) < scheduledata['time_end'] and time() > last_time[scheduletype]+scheduledata['frequency']-1:
+			if strftime('%a', now) in scheduledata['day_of_week'] and int(strftime('%H', now)) > scheduledata['time_begin'] and int(strftime('%H', now)) < scheduledata['time_end'] and time() > lasttime[scheduletype]+scheduledata['frequency']-1:
 				print scheduletype
 				print "---\n"
 				actionlist.append(scheduletype)
@@ -53,11 +53,11 @@ class outlierURLs(object):
 		return actionlist, frequency
 
 
-	def getlast_time(self, time):
-		last_time = {}
+	def getLastTime(self, time):
+		lasttime = {}
 		for scheduletype in self.schedule.iterkeys():
-			last_time[scheduletype] = time
-		return last_time
+			lasttime[scheduletype] = time
+		return lasttime
 	def getProducts(self):
 		return self.parseOverview(self.PANTS_URL)
 	def getWTF(self):

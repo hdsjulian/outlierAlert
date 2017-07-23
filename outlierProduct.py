@@ -1,8 +1,13 @@
 
 class outlierProduct(object):
-	def __init__(self, infile, output):
-		self.url = infile
-		self.product_id = 0
+	def __init__(self, output, inproduct):
+		if inproduct:
+			if 'product_id' in inproduct.keys():
+				self.product_id = inproduct['product_id']
+			if 'url' in inproduct.keys():
+				self.url = inproduct['url']
+			if 'image_url' in inproduct.keys():
+				self.image_url = inproduct['image_url']
 		self.name = ""
 		self.color_size_price = {}
 		self.minPrice = 0
@@ -17,10 +22,14 @@ class outlierProduct(object):
 			self.product_id = product_id
 
 	def getProductId(self):
-		return self.product_id	
+		return self.product_id
+
 
 	def getColors(self):
 		return self.color_size_price
+
+	def getURL(self):
+		return self.url
 
 	def getColor(self, color_id):
 		return self.color_size_price[color_id]

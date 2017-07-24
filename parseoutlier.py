@@ -27,6 +27,7 @@ def checkProduct(product, f):
 
 while True:
 	scheduled_tasks, frequency = URLs.checkSchedule(schedule_lasttime)
+	output.readTelegramMessages()
 	print scheduled_tasks
 	for task in scheduled_tasks: 
 		f = open('outlier.log', "w")

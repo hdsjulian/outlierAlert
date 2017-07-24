@@ -3,6 +3,7 @@ import time
 import cPickle
 import telepot
 from pprint import pprint
+import config as config
 class outlierOutput(object):
 	def __init__(self):
 		self.sqlite_file = "outlier.sqlite"
@@ -10,7 +11,7 @@ class outlierOutput(object):
 		self.cursor = (self.conn.cursor())
 		self.telegram_offset = self.getTelegramOffset()
 		self.telegram_users = self.fetchTelegramUsers()
-		self.bot = telepot.Bot('')
+		self.bot = telepot.Bot(config.telegram_code)
 		self.readTelegramMessages()
 	def __del__(self):
 		self.conn.close()
@@ -20,7 +21,6 @@ class outlierOutput(object):
 		self.cursor.execute(query)
 		products = []
 		for line in self.cursor.fetchall():
-			print "product_id = "+str(line[0])
 			products.append({'product_id':line[0], 'url':line[1]})
 		return products
 
@@ -32,7 +32,6 @@ class outlierOutput(object):
 		for message in response:
 			if 'message' not in message.iterkeys():
 				continue
-			print message
 			offset = int(message['update_id'])
 			user_id = int(message['message']['chat']['id'])
 			if 'username' in message['message']['chat'].keys():

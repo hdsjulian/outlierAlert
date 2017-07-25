@@ -85,6 +85,7 @@ class outlierProduct(object):
 		if int(price) < self.minPrice or self.minPrice == 0:
 			self.minPrice = price
 	def save(self):
+		print "save called"+str(self.getProductId())
 		self.output.addProduct(self)
 		for color_key, color in self.getColors().iteritems():
 			self.output.addProductColor(color_key, self.product_id)

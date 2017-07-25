@@ -34,7 +34,6 @@ while True:
 		schedule_lasttime[task] = time.time()
 		if task == 'restock':
 			products = output.getProducts()
-			products = []
 		if task == 'products':
 			products = URLs.getProducts()
 		if task == 'wtf':
@@ -46,6 +45,10 @@ while True:
 					checkProduct(product,f)
 				else:
 					product = output.getProductData(product)
+			else:
+				print 'foo'
+				#checkProduct(product, f)
+		print "done "+task
 		f.close()
 	nexttime = lasttime+frequency
 	now = time.time()

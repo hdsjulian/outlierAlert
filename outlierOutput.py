@@ -92,6 +92,7 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
+		ßtelegram_users = [111127184]
 		return telegram_users
 
 	def checkForProduct(self, product_id):
@@ -105,14 +106,12 @@ class outlierOutput(object):
 			return False
 
 	def addProduct(self, product):
-		query = 'INSERT INTO product (product_id, product_name, introduction, URL, story, description) VALUES({id}, "{name}", {ts}, "{url}", "{story}", "{desc}")'.format(id=product.product_id, name = product.name, ts = time.time(), url=product.url, story=product.story, desc=product.description)
-		try:
-			self.cursor.execute(query)
-			self.conn.commit()
-			product.new = True
-			self.telegramProductNotification(product)
-		except Exception as e: 
-			pass
+		query = 'INSERT INTO product (product_id, product_name, introduction, URL, story, description) VALUES(?, ?, ?, ?, ?, ?)'
+		print query
+		self.cursor.execute(query, (product.product_id, product.name, time.time(), product.url, product.story, product.description))
+		self.conn.commit()
+		product.new = True
+		self.telegramProductNotification(product)
 	def checkProductColorSizes(self, product_color_id, sizes):
 		query = 'SELECT sizes FROM product_color_size WHERE product_color_id = {pcid} ORDER BY timestamp DESC'.format(pcid=product_color_id)
 		self.cursor.execute(query)
@@ -198,7 +197,7 @@ class outlierOutput(object):
 		for v in product.color_size_price.itervalues():
 			color_size_price_string = color_size_price_string+"\nColor: "+v['color']+"\nPrice: "+v['price']+"\nSizes: "+', '.join(v["sizes"])
 		for telegram_user in self.telegram_users:
-			self.bot.sendMessage(user, "New Product!\nProduct ID:"+str(product.product_id)+"\nProduct Name: "+product.name+"\nDescription:\n"+product.description+"\n"+color_size_price_string)
+			self.bot.sendMessage(telegram_user, "New Product!\nProduct ID:"+str(product.product_id)+"\nProduct Name: "+product.name+"\nDescription:\n"+product.description+"\n"+color_size_price_string)
 
 	def telegramSizeNotification(self, product, color_id, sizeDifference):
 		if product.new is False:

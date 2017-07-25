@@ -22,14 +22,14 @@ class outlierMatch(object):
 	def matchPage(self, product):
 		for line in self.page.readlines():
 			self.linecount = self.linecount + 1
-			utfline = unicode(line, "utf8")
-			self.matchColor(line, product)
-			self.matchName(line, product)
-			self.matchProductId(line, product)
-			self.matchPrice(line, product)
-			self.matchSize(line, product)
-			self.matchDescription(line, product)
-			self.matchStory(line, product)
+			utf8line = unicode(line, "utf8")
+			self.matchColor(utf8line, product)
+			self.matchName(utf8line, product)
+			self.matchProductId(utf8line, product)
+			self.matchPrice(utf8line, product)
+			self.matchSize(utf8line, product)
+			self.matchDescription(utf8line, product)
+			self.matchStory(utf8line, product)
 
 	def matchColor(self, line, product):
 		matchcolor = re.search(self.patterns["color"], line)

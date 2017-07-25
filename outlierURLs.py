@@ -41,11 +41,9 @@ class outlierURLs(object):
 		now = localtime()
 		actionlist = []
 		frequency = 1000
-		print now
 		for scheduletype, scheduledata in self.schedule.iteritems():
-
 			frequency = scheduledata['frequency'] if frequency > scheduledata['frequency'] else frequency
-			if strftime('%a', now) in scheduledata['day_of_week'] and int(strftime('%H', now)) > scheduledata['time_begin'] and int(strftime('%H', now)) < scheduledata['time_end'] and time() > lasttime[scheduletype]+scheduledata['frequency']-1:
+			if strftime('%a', now) in scheduledata['day_of_week'] and int(strftime('%H', now)) >= scheduledata['time_begin'] and int(strftime('%H', now)) < scheduledata['time_end'] and time() > lasttime[scheduletype]+scheduledata['frequency']-1:
 				print scheduletype
 				print "---\n"
 				actionlist.append(scheduletype)

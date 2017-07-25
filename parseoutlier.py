@@ -30,7 +30,7 @@ while True:
 	output.readTelegramMessages()
 	print scheduled_tasks
 	for task in scheduled_tasks: 
-		f = open('outlier.log', "a")
+		f = open('outlier.log', "ab")
 		f.write(str(datetime.now())+": "+task+" called\n")
 		schedule_lasttime[task] = time.time()
 		if task == 'restock':

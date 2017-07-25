@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 output = outlierOutput()
 URLs = outlierURLs(output, 1)
-schedule_lasttime = URLs.getLastTime(time.time())
+schedule_lasttime = URLs.getLastTime(0)
 
 print schedule_lasttime
 lasttime = time.time()

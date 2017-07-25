@@ -59,17 +59,21 @@ class outlierURLs(object):
 			lasttime[scheduletype] = time
 		return lasttime
 	def getProducts(self):
-		return self.parseOverview(self.PANTS_URL)
+		products = []
+		for url in self.urls['overview']:
+			products = self.parseOverview(url, products)
+		return products
+
+		return returnproducts
 	def getWTF(self):
 		return [{'product_id':6325, 'url':self.WTF_TOP_URL}, {'product_id':6361, 'url':self.WTF_BOTTOM_URL}]
-	def parseOverview(self, url):
+	def parseOverview(self, url, product_list):
 		print url
 		url_count = 0
 		warning_match="shop_post_title"
 		url_match = "href=\"(.*)\" "
 		image_url_match = "img src=\"(.*)\" width"
 		product_id_match = "input type=\"hidden\" name=\"product\" value=\"(.*)\" "
-		products = []
 		product = {}
 		infile = urllib2.urlopen(url)
 		matches = {}
@@ -92,14 +96,14 @@ class outlierURLs(object):
 						if k == 'product_id':
 							product['product_id'] = v.group(1)
 							url_count = 0
-							products.append(product)
+							product_list.append(product)
 							product = {}
 							matches = {}
-		return products
+		return product_list
 
 
 
-def createfile_list(infile):
+def createfile_list(self, infile):
 	print infile
 	url_count = 0
 	warning_match = "shop_post_title"

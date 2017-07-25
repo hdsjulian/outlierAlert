@@ -18,7 +18,6 @@ lasttime = time.time()
 #products = URLs.getProducts()
 
 def checkProduct(product, f):
-	product = outlierProduct(output, product)
 	page = urllib2.urlopen(product.getURL())
 	f.write(product.getURL()+'\n\n')
 	match = outlierMatch(page)
@@ -35,12 +34,18 @@ while True:
 		schedule_lasttime[task] = time.time()
 		if task == 'restock':
 			products = output.getProducts()
+			products = []
 		if task == 'products':
 			products = URLs.getProducts()
 		if task == 'wtf':
 			products = URLs.getWTF()
 		for product in products: 
-			checkProduct(product,f)
+			product = outlierProduct(output, product)
+			if task =='products':
+				if not output.checkForProduct(product.getProductId()):
+					checkProduct(product,f)
+				else:
+					product = output.getProductData(product)
 		f.close()
 	nexttime = lasttime+frequency
 	now = time.time()

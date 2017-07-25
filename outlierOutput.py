@@ -24,6 +24,17 @@ class outlierOutput(object):
 			products.append({'product_id':line[0], 'url':line[1]})
 		return products
 
+	def getProductData(self, product):
+		query = "SELECT product_id, product_name, URL FROM product where product_id = {pid}".format(pid=product.getProductId())
+		self.cursor.execute(query)
+		row = self.cursor.fetchone()
+		if row:
+			product.setProductName(row[1])
+			product.setURL(row[2])
+			return product
+		else:
+			return False
+
 
 
 	def readTelegramMessages(self):
@@ -87,8 +98,10 @@ class outlierOutput(object):
 		query = 'SELECT product_id FROM product WHERE product_id = {id}'.format(id=product_id)
 		self.cursor.execute(query)
 		if self.cursor.fetchone(): 
+			print "known "+str(product_id)
 			return True
 		else: 
+			print "unknown "+str(product_id)
 			return False
 
 	def addProduct(self, product):

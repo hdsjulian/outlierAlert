@@ -24,12 +24,15 @@ class outlierProduct(object):
 	def getProductId(self):
 		return self.product_id
 
-
 	def getColors(self):
 		return self.color_size_price
 
 	def getURL(self):
 		return self.url
+	
+	def setURL(self, url):
+		if url:
+			self.url=url
 
 	def getColor(self, color_id):
 		return self.color_size_price[color_id]
@@ -40,9 +43,10 @@ class outlierProduct(object):
 	def getMaxPrice(self):
 		return self.maxPrice
 
-	def setName(self, name):
+	def setProductName(self, name):
 		if name:
 			self.name = name
+
 	def getName(self):
 		return self.name
 

@@ -39,7 +39,7 @@ class outlierMatch(object):
 	def matchName(self, line, product):
 		matchname = re.search(self.patterns["name"], line)
 		if matchname:
-			product.setName(matchname.group(1))
+			product.setProductName(matchname.group(1))
 
 	def matchProductId(self, line, product):
 		match_product_id = re.search(self.patterns["product_id"], line)

@@ -81,7 +81,6 @@ class outlierMatch(object):
 					line = re.sub(self.strip_html, "", line)
 					self.story += line
 			if match_story_3:
-				print match_story_3.group(1)
 				self.storymatch = 0
 		if match_story_headline: 
 			self.storymatch = 1

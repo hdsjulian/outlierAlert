@@ -16,102 +16,36 @@ class outlierOutput(object):
 	def __del__(self):
 		self.conn.close()
 
-	def getProducts(self):
-		query = "SELECT product_id, url FROM product"
-		self.cursor.execute(query)
-		products = []
-		for line in self.cursor.fetchall():
-			products.append({'product_id':line[0], 'url':line[1]})
-		return products
 
-	def getProductData(self, product):
-		query = "SELECT product_id, product_name, URL FROM product where product_id = {pid}".format(pid=product.getProductId())
-		self.cursor.execute(query)
-		row = self.cursor.fetchone()
-		if row:
-			product.setProductName(row[1])
-			product.setURL(row[2])
-			return product
-		else:
-			return False
-
-
-
-	def readTelegramMessages(self):
-		response = self.bot.getUpdates(offset=self.telegram_offset)
-		offset = self.telegram_offset
-		for message in response:
-			if 'message' not in message.iterkeys():
-				continue
-			offset = int(message['update_id'])
-			user_id = int(message['message']['chat']['id'])
-			if 'username' in message['message']['chat'].keys():
-				user_name = message['message']['chat']['username']
-			else:
-				user_name = message['message']['chat']['first_name']+' '+message['message']['chat']['last_name']
-
-			if message['message']['text'] == "/subscribe":
-				if user_id not in self.telegram_users:
-					self.addTelegramUser(user_id, user_name)
-
-			elif message['message']['text'] == "/unsubscribe":
-				if user_id in self.telegram_users:
-					self.delTelegramUser(user_id)
-		if offset > self.telegram_offset: 
-			self.saveTelegramOffset(offset+1)
-
-	def getTelegramOffset(self):
-		query = "SELECT offset FROM telegram_offset"
-		self.cursor.execute(query)
-		return self.cursor.fetchone()[0]
-
-	def saveTelegramOffset(self, offset):
-		query = "UPDATE telegram_offset SET offset = {new_offset} WHERE offset = {offset}".format(new_offset = offset, offset=self.telegram_offset)
-		self.cursor.execute(query)
-		self.conn.commit()
-		self.telegram_offset = offset
-
-	def delTelegramUser(self, user_id):
-		query = "DELETE FROM telegram_users WHERE user_id = {uid}".format(uid=user_id)
-		self.cursor.execute(query)
-		self.conn.commit()
-		self.telegram_users.remove(user_id)
-		self.bot.sendMessage(user_id, "Unsubscribed!")
-
-
-	def addTelegramUser(self, user_id, user_name):
-		query = "INSERT INTO telegram_users (user_name, user_id) VALUES ('{un}', {uid})".format(un=user_name, uid=user_id)
-		self.cursor.execute(query)
-		self.conn.commit()
-		self.telegram_users.append(user_id)
-		self.bot.sendMessage(user_id, "Subscribed! To Unsubscribe send a message with /unsubscribe")
-
-	def fetchTelegramUsers(self):
-		query = "SELECT user_id FROM telegram_users"
-		self.cursor.execute(query)
-		telegram_users = []
-		for line in self.cursor.fetchall():
-			telegram_users.append(line[0])	
-		#telegram_users = [111127184]
-		return telegram_users
 
 	def checkForProduct(self, product_id):
 		query = 'SELECT product_id FROM product WHERE product_id = {id}'.format(id=product_id)
 		self.cursor.execute(query)
 		if self.cursor.fetchone(): 
-			print "known "+str(product_id)
 			return True
 		else: 
-			print "unknown "+str(product_id)
 			return False
+
+	def getProducts(self):
+		returnproducts = []
+		query = 'SELECT product_id, url FROM product'
+		self.cursor.execute(query)
+		for line in self.cursor.fetchall():
+			returnproducts.append({'product_id':line[0], 'url':line[1]})
+		return returnproducts
+
+
 
 	def addProduct(self, product):
 		query = 'INSERT INTO product (product_id, product_name, introduction, URL, story, description) VALUES(?, ?, ?, ?, ?, ?)'
-		print query
-		self.cursor.execute(query, (product.product_id, product.name, time.time(), product.url, product.story, product.description))
-		self.conn.commit()
-		product.new = True
-		self.telegramProductNotification(product)
+		try: 
+			self.cursor.execute(query, (product.product_id, product.name, time.time(), product.url, product.story, product.description))
+			self.conn.commit()
+			product.new = True
+			self.telegramProductNotification(product)
+		except:
+			pass
+	
 	def checkProductColorSizes(self, product_color_id, sizes):
 		query = 'SELECT sizes FROM product_color_size WHERE product_color_id = {pcid} ORDER BY timestamp DESC'.format(pcid=product_color_id)
 		self.cursor.execute(query)
@@ -203,7 +137,65 @@ class outlierOutput(object):
 		if product.new is False:
 			if sizeDifference[0] != []:
 				for telegram_user in self.telegram_users:
-					self.bot.sendMessage(self.telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference[0]))
+					self.bot.sendMessage(telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference[0]))
 			if sizeDifference[1] != []:
 				#self.bot.sendMessage(self.telegram_user, "Size Sold Out!!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference[1]))
 				pass
+
+	def readTelegramMessages(self):
+		response = self.bot.getUpdates(offset=self.telegram_offset)
+		offset = self.telegram_offset
+		for message in response:
+			if 'message' not in message.iterkeys():
+				continue
+			offset = int(message['update_id'])
+			user_id = int(message['message']['chat']['id'])
+			if 'username' in message['message']['chat'].keys():
+				user_name = message['message']['chat']['username']
+			else:
+				user_name = message['message']['chat']['first_name']+' '+message['message']['chat']['last_name']
+
+			if message['message']['text'] == "/subscribe":
+				if user_id not in self.telegram_users:
+					self.addTelegramUser(user_id, user_name)
+
+			elif message['message']['text'] == "/unsubscribe":
+				if user_id in self.telegram_users:
+					self.delTelegramUser(user_id)
+		if offset > self.telegram_offset: 
+			self.saveTelegramOffset(offset+1)
+
+	def getTelegramOffset(self):
+		query = "SELECT offset FROM telegram_offset"
+		self.cursor.execute(query)
+		return self.cursor.fetchone()[0]
+
+	def saveTelegramOffset(self, offset):
+		query = "UPDATE telegram_offset SET offset = {new_offset} WHERE offset = {offset}".format(new_offset = offset, offset=self.telegram_offset)
+		self.cursor.execute(query)
+		self.conn.commit()
+		self.telegram_offset = offset
+
+	def delTelegramUser(self, user_id):
+		query = "DELETE FROM telegram_users WHERE user_id = {uid}".format(uid=user_id)
+		self.cursor.execute(query)
+		self.conn.commit()
+		self.telegram_users.remove(user_id)
+		self.bot.sendMessage(user_id, "Unsubscribed!")
+
+
+	def addTelegramUser(self, user_id, user_name):
+		query = "INSERT INTO telegram_users (user_name, user_id) VALUES ('{un}', {uid})".format(un=user_name, uid=user_id)
+		self.cursor.execute(query)
+		self.conn.commit()
+		self.telegram_users.append(user_id)
+		self.bot.sendMessage(user_id, "Subscribed! To Unsubscribe send a message with /unsubscribe")
+
+	def fetchTelegramUsers(self):
+		query = "SELECT user_id FROM telegram_users"
+		self.cursor.execute(query)
+		telegram_users = []
+		for line in self.cursor.fetchall():
+			telegram_users.append(line[0])	
+		#telegram_users = [111127184]
+		return telegram_users

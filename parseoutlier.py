@@ -12,7 +12,6 @@ output = outlierOutput()
 URLs = outlierURLs(output, 1)
 schedule_lasttime = URLs.getLastTime(0)
 
-print schedule_lasttime
 lasttime = time.time()
 
 #products = URLs.getProducts()
@@ -27,7 +26,6 @@ def checkProduct(product, f):
 while True:
 	scheduled_tasks, frequency = URLs.checkSchedule(schedule_lasttime)
 	output.readTelegramMessages()
-	print scheduled_tasks
 	for task in scheduled_tasks: 
 		f = open('outlier.log', "ab")
 		f.write(str(datetime.now())+": "+task+" called\n")
@@ -46,9 +44,7 @@ while True:
 				else:
 					product = output.getProductData(product)
 			else:
-				print 'foo'
-				#checkProduct(product, f)
-		print "done "+task
+				checkProduct(product,f)
 		f.close()
 	nexttime = lasttime+frequency
 	now = time.time()

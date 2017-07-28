@@ -167,8 +167,7 @@ class outlierOutput(object):
 					self.delTelegramUser(user_id)
 			elif user_id in self.telegram_users: 
 				self.parseTelegramMessage(message)
-			if offset >= self.telegram_offset: 
-				self.saveTelegramOffset(offset+1)
+			self.saveTelegramOffset(offset+1)
 	
 	def parseTelegramMessage(self, message):
 		patterns = {}

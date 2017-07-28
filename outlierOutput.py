@@ -18,6 +18,7 @@ class outlierOutput(object):
 		self.cursor = (self.conn.cursor())
 		self.telegram_offset = self.getTelegramOffset()
 		self.telegram_users = self.fetchTelegramUsers()
+		self.telegramSubscriptions = self.fetchTelegramSubscriptions()
 		self.bot = telepot.Bot(config.telegram_code)
 		#self.readTelegramMessages()
 	
@@ -288,18 +289,19 @@ class outlierOutput(object):
 		self.bot.sendMessage(user_id, "Subscribed! To Unsubscribe send a message with /unsubscribe")
 
 	def fetchTelegramSubscriptions(self):
-		self.telegramSubscriptions = {}
+		telegramSubscriptions = {}
 		query = 'SELECT user_id, allsizes FROM telegram_users'
 		self.cursor.execute(query)
 		for line in self.cursor.fetchall():
-			self.telegramSubscriptions[line[0]] = []
+			telegramSubscriptions[line[0]] = []
 			if line[1] == 0:
 				query = 'SELECT size FROM telegram_user_sizes WHERE user_id = {uid}'.format(uid=line[0])
 				self.cursor.execute(query)
 				for size in self.cursor.fetchall():
-					self.telegramSubscriptions[line[0]].append(size[0])
+					telegramSubscriptions[line[0]].append(size[0])
 			elif line[1] == 1:
-				self.telegramSubscriptions.append('all')
+				telegramSubscriptions.append('all')
+		return telegramSubscriptions
 
 	def fetchTelegramUsers(self):
 		query = "SELECT user_id FROM telegram_users"

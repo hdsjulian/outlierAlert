@@ -220,10 +220,11 @@ class outlierOutput(object):
 			self.bot.sendMessage(user_id, "You subscribed to all sizes. To unsubscribe send /unsize all")
 			self.telegramSubscriptions[user_id] = ['all']
 		else: 
-			query = "SELECT * FROM telegram_user_sizes WHERE user_id = {user_id} AND size = {size}".format(user_id=user_id, size=size)
+			query = "SELECT * FROM telegram_user_sizes WHERE user_id = {user_id} AND size = '{size}'".format(user_id=user_id, size=size)
+			print query 
 			self.cursor.execute(query)
 			if not self.cursor.fetchone():
-				query = 'INSERT INTO telegram_user_sizes (user_id, size) VALUES ({user_id}, {size})'.format(user_id=user_id, size=size)
+				query = 'INSERT INTO telegram_user_sizes (user_id, size) VALUES ({user_id}, "{size}")'.format(user_id=user_id, size=size)
 				self.cursor.execute(query)
 				self.conn.commit()
 				self.bot.sendMessage(user_id, "Size "+size+" subscribed. To unsubscribe send /unsize [size]")

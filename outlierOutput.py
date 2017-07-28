@@ -300,7 +300,7 @@ class outlierOutput(object):
 				for size in self.cursor.fetchall():
 					telegramSubscriptions[line[0]].append(size[0])
 			elif line[1] == 1:
-				telegramSubscriptions.append('all')
+				telegramSubscriptions[line[0]].append('all')
 		return telegramSubscriptions
 
 	def fetchTelegramUsers(self):

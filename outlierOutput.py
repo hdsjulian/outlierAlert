@@ -168,7 +168,6 @@ class outlierOutput(object):
 					self.delTelegramUser(user_id)
 			elif user_id in self.telegram_users: 
 				self.parseTelegramMessage(message)
-			print "saving telegram offset"+str(offset+1)
 			self.saveTelegramOffset(offset+1)
 	
 	def parseTelegramMessage(self, message):
@@ -185,8 +184,6 @@ class outlierOutput(object):
 			match = re.search(pattern,message['message']['text'])
 			if match: 
 				if patternName == 'sizesubscription':
-					print 'sizesubscription called'+message['message']['text']
-					print 'message id '+str(message['update_id'])
 					self.telegramAddSizeSubscription(user_id, match.group(1))
 				elif patternName == 'sizeunsubscription':
 					print 'sizeunsubscription called'+message['message']['text']

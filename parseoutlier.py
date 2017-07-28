@@ -13,7 +13,6 @@ URLs = outlierURLs(output, 1)
 schedule_lasttime = URLs.getLastTime(0)
 
 lasttime = time.time()
-
 #products = URLs.getProducts()
 
 def checkProduct(product, f):
@@ -41,8 +40,6 @@ while True:
 			if task =='products':
 				if not output.checkForProduct(product.getProductId()):
 					checkProduct(product,f)
-				else:
-					product = output.getProductData(product)
 			else:
 				checkProduct(product,f)
 		f.close()

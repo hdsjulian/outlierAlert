@@ -144,11 +144,11 @@ class outlierOutput(object):
 	def telegramSizeNotification(self, product, color_id, sizeDifference):
 		if product.new is False:
 			for telegram_user in self.telegram_users:
-				if list(set(self.telegramSubscriptions[telegram_users]) & set(sizeDifference)) or 'all' in self.telegramSubscriptions[telegram_user]:
+				if list(set(self.telegramSubscriptions[self.telegram_users]) & set(sizeDifference)) or 'all' in self.telegramSubscriptions[telegram_user]:
 					self.bot.sendMessage(telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference))
 
 	def readTelegramMessages(self):
-		response = self.bot.getUpdates(offset=self.telegram_offset)
+		response = self.bot.getUpdates(offset=self.telegram_offset+1)
 		offset = self.telegram_offset
 		for message in response:
 			if 'message' not in message.iterkeys():
@@ -168,7 +168,7 @@ class outlierOutput(object):
 					self.delTelegramUser(user_id)
 			elif user_id in self.telegram_users: 
 				self.parseTelegramMessage(message)
-			self.saveTelegramOffset(offset+1)
+			self.saveTelegramOffset(offset)
 	
 	def parseTelegramMessage(self, message):
 		patterns = {}

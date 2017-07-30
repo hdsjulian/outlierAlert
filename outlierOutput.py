@@ -209,6 +209,8 @@ class outlierOutput(object):
 /unsize all - unsubscribe from all restock notifications
 
 /size (or unsize) one - subscribe/unsubscribe all restock notifications for one-size items
+
+/sizes - list all your size subscriptions
 		"""
 		self.bot.sendMessage(user_id, helpMessage)
 

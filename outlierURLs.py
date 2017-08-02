@@ -20,21 +20,21 @@ class outlierURLs(object):
 		self.urls['wtf'] = {self.WTF_TOP_URL, self.WTF_BOTTOM_URL}
 		self.schedule['wtf'] = {
 			'day_of_week':['Tue','Wed', 'Thu'], 
-			'time_begin':12, 
+			'time_begin':17, 
 			'time_end':23,
 			'frequency': 60
 		}
 		self.schedule['products'] = {
-			'day_of_week':['Tue','Wed', 'Thu'], 
-			'time_begin':12, 
+			'day_of_week':['Tue', 'Thu'], 
+			'time_begin':17, 
 			'time_end':22,
-			'frequency': 60
+			'frequency': 600
 		}
 		self.schedule['restock'] = {
-			'day_of_week':['Tue', 'Wed', 'Thu'], 
-			'time_begin':12, 
+			'day_of_week':['Tue', 'Thu'], 
+			'time_begin':17, 
 			'time_end':22,
-			'frequency': 60
+			'frequency': 600
 		}
 
 	def checkSchedule(self, lasttime):

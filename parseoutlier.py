@@ -30,12 +30,16 @@ while True:
 		f.write(str(datetime.now())+": "+task+" called\n")
 		schedule_lasttime[task] = time.time()
 		if task == 'restock':
+			print 'restock called'
 			products = output.getProducts()
 		if task == 'products':
+			print 'products called'
 			products = URLs.getProducts()
 		if task == 'wtf':
+			print 'wtf called'
 			products = URLs.getWTF()
 		for product in products: 
+			print 'checking '+product['url']
 			product = outlierProduct(output, product)
 			if task =='products':
 				if not output.checkForProduct(product.getProductId()):

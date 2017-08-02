@@ -63,7 +63,7 @@ class outlierOutput(object):
 			elif len(cPickle.loads(str(result[0]))) < len(sizes):
 				return [item for item in sizes if item not in cPickle.loads(str(result[0]))]
 		else: 
-			return [sizes]
+			return sizes
 
 	def addProductColorSizes(self, product, color_id, sizes):
 		product_color_id = self.getProductColorId(product.product_id, color_id)
@@ -78,7 +78,7 @@ class outlierOutput(object):
 			except Exception as e:
 				return False
 			self.conn.commit()
-			if sizeDifference != sizes and sizeDifference:
+			if sizeDifference == sizes and sizeDifference:
 				self.telegramSizeNotification(product, color_id, sizeDifference)
 			return True
 			
@@ -88,6 +88,7 @@ class outlierOutput(object):
 			try: 
 				self.cursor.execute(query)
 				self.conn.commit()
+				print query
 			except Exception as e: 
 				pass
 	def addColor(self, color_id, color_name):
@@ -144,8 +145,13 @@ class outlierOutput(object):
 	def telegramSizeNotification(self, product, color_id, sizeDifference):
 		if product.new is False:
 			for telegram_user in self.telegram_users:
-				if list(set(self.telegramSubscriptions[self.telegram_users]) & set(sizeDifference)) or 'all' in self.telegramSubscriptions[telegram_user]:
+
+				if list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference)) or 'all' in self.telegramSubscriptions[telegram_user]:
+					print "sollte schicken"
 					self.bot.sendMessage(telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference))
+				else: 
+					print self.telegramSubscriptions[telegram_user]
+					print sizeDifference
 
 	def readTelegramMessages(self):
 		response = self.bot.getUpdates(offset=self.telegram_offset+1)
@@ -186,7 +192,6 @@ class outlierOutput(object):
 				if patternName == 'sizesubscription':
 					self.telegramAddSizeSubscription(user_id, match.group(1))
 				elif patternName == 'sizeunsubscription':
-					print 'sizeunsubscription called'+message['message']['text']
 					self.telegramDeleteSizeSubscription(user_id, match.group(1))
 				elif patternName == 'help':
 					self.telegramSendHelpMessage(user_id)
@@ -223,7 +228,6 @@ class outlierOutput(object):
 			self.telegramSubscriptions[user_id] = ['all']
 		else: 
 			query = "SELECT * FROM telegram_user_sizes WHERE user_id = {user_id} AND size = '{size}'".format(user_id=user_id, size=size)
-			print query 
 			self.cursor.execute(query)
 			if not self.cursor.fetchone():
 				query = 'INSERT INTO telegram_user_sizes (user_id, size) VALUES ({user_id}, "{size}")'.format(user_id=user_id, size=size)
@@ -286,7 +290,7 @@ class outlierOutput(object):
 		self.cursor.execute(query)
 		self.conn.commit()
 		self.telegram_users.append(user_id)
-		self.bot.sendMessage(user_id, "Subscribed! To Unsubscribe send a message with /unsubscribe")
+		self.bot.sendMessage(user_id, "Subscribed! To Unsubscribe send a message with /unsubscribe. For Help send a message with /help")
 
 	def fetchTelegramSubscriptions(self):
 		telegramSubscriptions = {}
@@ -309,5 +313,5 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		#telegram_users = [111127184]
+		telegram_users = [111127184]
 		return telegram_users

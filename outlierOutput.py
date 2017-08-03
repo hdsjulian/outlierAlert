@@ -5,6 +5,7 @@ import telepot
 from pprint import pprint
 import config as config
 import re
+import logging
 #todo: telegramsizenotification: bundle restock messages all in one (per product or per color?)
 #todo: make size notifications subscribable by user
 #todo: make addproduct more elegant
@@ -13,6 +14,7 @@ import re
 
 class outlierOutput(object):
 	def __init__(self):
+		self.logger = logging.getLogger('outlier')
 		self.sqlite_file = "outlier.sqlite"
 		self.conn = sqlite3.connect(self.sqlite_file)
 		self.cursor = (self.conn.cursor())
@@ -147,11 +149,11 @@ class outlierOutput(object):
 			for telegram_user in self.telegram_users:
 
 				if list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference)) or 'all' in self.telegramSubscriptions[telegram_user]:
-					print "sollte schicken"
+					self.logger.debug("Sent Restock to "+str(telegram_user)+" for "+product.name+" in Color: "+product.color_size_price[color_id]["color"]+" Sizes: "+", ".join(sizeDifference))
 					self.bot.sendMessage(telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference))
 				else: 
-					print self.telegramSubscriptions[telegram_user]
-					print sizeDifference
+					self.logger.debug("User "+str(telegram_user)+" does not want size notification for sizes"+', '.join(sizeDifference)+" Subscriptions:"+', '.join(self.telegramSubscriptions[telegram_user]))
+
 
 	def readTelegramMessages(self):
 		response = self.bot.getUpdates(offset=self.telegram_offset+1)
@@ -247,10 +249,14 @@ class outlierOutput(object):
 			self.bot.sendMessage(user_id, "You unsubscribed from receiving messages for all sizes. To subscribe to individual sizes send /size [size]")
 		else: 
 			query = "DELETE FROM telegram_user_sizes WHERE user_id ={user_id} AND size = {size}".format(user_id=user_id, size=size)
+			print query
+			print self.telegramSubscriptions[user_id]
+			print size
 			self.cursor.execute(query)
 			self.conn.commit()
 			self.bot.sendMessage(user_id, "You will no longer receive restock notifications for size "+size)
-		self.telegramSubscriptions[user_id].remove(size)
+		if size in self.telegramSubscriptions[user_id]:
+			self.telegramSubscriptions[user_id].remove(size)
 
 	def telegramSendSubscriptionData(self, user_id):
 		if 'all' in self.telegramSubscriptions[user_id]:
@@ -313,5 +319,5 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		#telegram_users = [111127184]
+		telegram_users = [111127184]
 		return telegram_users

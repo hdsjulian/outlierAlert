@@ -8,12 +8,23 @@ from outlierURLs import outlierURLs
 from pprint import pprint
 import time
 from datetime import datetime
+import logging
+logger = logging.getLogger('outlier')
+handler = logging.FileHandler('outliertest.log')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
+
+
 output = outlierOutput()
 URLs = outlierURLs(output, 1)
 schedule_lasttime = URLs.getLastTime(0)
 
 lasttime = time.time()
 #products = URLs.getProducts()
+
+
 
 def checkProduct(product, f):
 	page = urllib2.urlopen(product.getURL())

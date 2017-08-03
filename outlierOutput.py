@@ -147,7 +147,6 @@ class outlierOutput(object):
 	def telegramSizeNotification(self, product, color_id, sizeDifference):
 		if product.new is False:
 			for telegram_user in self.telegram_users:
-
 				if list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference)) or 'all' in self.telegramSubscriptions[telegram_user]:
 					self.logger.debug("Sent Restock to "+str(telegram_user)+" for "+product.name+" in Color: "+product.color_size_price[color_id]["color"]+" Sizes: "+", ".join(sizeDifference))
 					self.bot.sendMessage(telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference))
@@ -229,10 +228,10 @@ class outlierOutput(object):
 			self.bot.sendMessage(user_id, "You subscribed to all sizes. To unsubscribe send /unsize all")
 			self.telegramSubscriptions[user_id] = ['all']
 		else: 
-			query = "SELECT * FROM telegram_user_sizes WHERE user_id = {user_id} AND size = '{size}'".format(user_id=user_id, size=size)
+			query = "SELECT * FROM telegram_user_sizes WHERE user_id = {user_id} AND size = '{size}'".format(user_id=user_id, size=size.upper())
 			self.cursor.execute(query)
 			if not self.cursor.fetchone():
-				query = 'INSERT INTO telegram_user_sizes (user_id, size) VALUES ({user_id}, "{size}")'.format(user_id=user_id, size=size)
+				query = 'INSERT INTO telegram_user_sizes (user_id, size) VALUES ({user_id}, "{size}")'.format(user_id=user_id, size=size.upper())
 				self.cursor.execute(query)
 				self.conn.commit()
 				self.bot.sendMessage(user_id, "Size "+size+" subscribed. To unsubscribe send /unsize [size]")
@@ -243,12 +242,13 @@ class outlierOutput(object):
 
 	def telegramDeleteSizeSubscription(self, user_id, size):
 		if size == 'all':
+			self.logger.debug("unsize all called")
 			query = 'UPDATE telegram_users SET allsizes = 0 WHERE user_id = {user_id}'.format(user_id=user_id)
 			self.cursor.execute(query)
 			self.conn.commit()
 			self.bot.sendMessage(user_id, "You unsubscribed from receiving messages for all sizes. To subscribe to individual sizes send /size [size]")
 		else: 
-			query = "DELETE FROM telegram_user_sizes WHERE user_id ={user_id} AND size = {size}".format(user_id=user_id, size=size)
+			query = "DELETE FROM telegram_user_sizes WHERE user_id ={user_id} AND size = {size}".format(user_id=user_id, size=size.upper())
 			print query
 			print self.telegramSubscriptions[user_id]
 			print size
@@ -304,7 +304,7 @@ class outlierOutput(object):
 		self.cursor.execute(query)
 		for line in self.cursor.fetchall():
 			telegramSubscriptions[line[0]] = []
-			if line[1] == 0:
+			if line[1] != 1:
 				query = 'SELECT size FROM telegram_user_sizes WHERE user_id = {uid}'.format(uid=line[0])
 				self.cursor.execute(query)
 				for size in self.cursor.fetchall():

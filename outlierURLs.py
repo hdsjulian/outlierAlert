@@ -27,13 +27,13 @@ class outlierURLs(object):
 		self.schedule['products'] = {
 			'day_of_week':['Tue', 'Thu'], 
 			'time_begin':17, 
-			'time_end':22,
+			'time_end':23,
 			'frequency': 600
 		}
 		self.schedule['restock'] = {
 			'day_of_week':['Tue', 'Thu'], 
 			'time_begin':17, 
-			'time_end':22,
+			'time_end':23,
 			'frequency': 600
 		}
 

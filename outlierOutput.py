@@ -6,10 +6,10 @@ from pprint import pprint
 import config as config
 import re
 import logging
-#todo: telegramsizenotification: bundle restock messages all in one (per product or per color?)
-#todo: make size notifications subscribable by user
 #todo: make addproduct more elegant
+#todo product color sizes is broken
 #todo: create populateProduct method
+#was passiert: ich guck nur ob was dazu kam. speicher aber nicht wenns weggging
 
 
 class outlierOutput(object):
@@ -61,8 +61,10 @@ class outlierOutput(object):
 		result = self.cursor.fetchone()
 		if result: 
 			if cPickle.loads(str(result[0])) == sizes:
+				self.logger.debug(str(product_color_id)+" sizes the same"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
 				return False
 			elif len(cPickle.loads(str(result[0]))) < len(sizes):
+				self.logger.debug(str(product_color_id)+" size different"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
 				return [item for item in sizes if item not in cPickle.loads(str(result[0]))]
 		else: 
 			return sizes
@@ -164,8 +166,15 @@ class outlierOutput(object):
 			user_id = int(message['message']['chat']['id'])
 			if 'username' in message['message']['chat'].keys():
 				user_name = message['message']['chat']['username']
-			else:
+			elif 'last_name' in message['message']['chat'] and 'first_name' in message['message']['chat']:
 				user_name = message['message']['chat']['first_name']+' '+message['message']['chat']['last_name']
+			elif 'last_name' in message['message']['chat']:
+				user_name = mmessage['message']['chat']['last_name']
+			elif 'first_name' in message['message']['chat']:
+				user_name = message['message']['chat']['first_name']
+			else:
+				user_name = 'Unknown'
+
 
 			if message['message']['text'] == "/subscribe":
 				if user_id not in self.telegram_users:

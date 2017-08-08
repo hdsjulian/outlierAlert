@@ -27,11 +27,14 @@ lasttime = time.time()
 
 
 def checkProduct(product, f):
-	page = urllib2.urlopen(product.getURL())
-	f.write(product.getURL()+'\n\n')
-	match = outlierMatch(page)
-	match.matchPage(product)
-	product.save()
+	try: 
+		page = urllib2.urlopen(product.getURL())
+		f.write(product.getURL()+'\n\n')
+		match = outlierMatch(page)
+		match.matchPage(product)
+		product.save()
+	except: 
+		logger.debug("URL could not be opened "+product.getURL())
 
 while True:
 	scheduled_tasks, frequency = URLs.checkSchedule(schedule_lasttime)

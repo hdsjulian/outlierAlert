@@ -63,27 +63,30 @@ class outlierOutput(object):
 			if cPickle.loads(str(result[0])) == sizes:
 				self.logger.debug(str(product_color_id)+" sizes the same"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
 				return False
-			elif len(cPickle.loads(str(result[0]))) < len(sizes):
+			else: 
 				self.logger.debug(str(product_color_id)+" size different"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
-				return [item for item in sizes if item not in cPickle.loads(str(result[0]))]
+				return [[item for item in sizes if item not in cPickle.loads(str(result[0]))], [item for item in cPickle.loads(str(result[0])) if item not in sizes]]
 		else: 
-			return sizes
+			return [sizes, sizes]
 
 	def addProductColorSizes(self, product, color_id, sizes):
 		product_color_id = self.getProductColorId(product.product_id, color_id)
 		if not product_color_id: 
 			return False
 		sizeDifference = self.checkProductColorSizes(product_color_id, sizes)
-
-		if sizeDifference is not False:
-			query = 'INSERT INTO product_color_size (product_color_id, sizes, timestamp) VALUES ({pcid}, "{sizes}", {ts})'.format(pcid=product_color_id, sizes=cPickle.dumps(sizes), ts=time.time())
-			try: 
-				self.cursor.execute(query)
-			except Exception as e:
-				return False
-			self.conn.commit()
-			if sizeDifference == sizes and sizeDifference:
-				self.telegramSizeNotification(product, color_id, sizeDifference)
+		if sizeDifference:
+			if sizeDifference[0] != sizeDifference[1]:
+				query = 'INSERT INTO product_color_size (product_color_id, sizes, timestamp) VALUES ({pcid}, "{sizes}", {ts})'.format(pcid=product_color_id, sizes=cPickle.dumps(sizes), ts=time.time())
+				try: 
+					self.cursor.execute(query)
+				except Exception as e:
+					return False
+				self.conn.commit()
+			if len(sizeDifference[0])>0:
+				self.logger.debug(("should send size notification"))
+				self.telegramSizeNotification(product, color_id, sizeDifference[0])
+			if len(sizeDifference[1])>0:
+				self.logger.debug("Less stock than new for "+product.name)
 			return True
 			
 	def addProductColor(self, color_id, product_id):
@@ -92,7 +95,6 @@ class outlierOutput(object):
 			try: 
 				self.cursor.execute(query)
 				self.conn.commit()
-				print query
 			except Exception as e: 
 				pass
 	def addColor(self, color_id, color_name):
@@ -258,9 +260,6 @@ class outlierOutput(object):
 			self.bot.sendMessage(user_id, "You unsubscribed from receiving messages for all sizes. To subscribe to individual sizes send /size [size]")
 		else: 
 			query = "DELETE FROM telegram_user_sizes WHERE user_id ={user_id} AND size = {size}".format(user_id=user_id, size=size.upper())
-			print query
-			print self.telegramSubscriptions[user_id]
-			print size
 			self.cursor.execute(query)
 			self.conn.commit()
 			self.bot.sendMessage(user_id, "You will no longer receive restock notifications for size "+size)
@@ -328,5 +327,5 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		#telegram_users = [111127184]
+		telegram_users = [111127184]
 		return telegram_users

@@ -327,5 +327,5 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		telegram_users = [111127184]
+		#telegram_users = [111127184]
 		return telegram_users

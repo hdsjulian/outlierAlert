@@ -62,7 +62,7 @@ class outlierOutput(object):
 		result = self.cursor.fetchone()
 		if result: 
 			if cPickle.loads(str(result[0])) == sizes:
-				self.logger.debug(str(product_color_id)+" sizes the same"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
+				#self.logger.debug(str(product_color_id)+" sizes the same"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
 				return False
 			else: 
 

@@ -20,7 +20,7 @@ class outlierOutput(object):
 		self.cursor = (self.conn.cursor())
 		self.telegram_offset = self.getTelegramOffset()
 		self.telegram_users = self.fetchTelegramUsers()
-		self.logger.debug("Telegram users: "+", ".join(str([x for x in self.telegram_users])))
+		self.logger.debug("Telegram users: "+", ".join([x for x in self.telegram_users]))
 		self.telegramSubscriptions = self.fetchTelegramSubscriptions()
 		self.bot = telepot.Bot(config.telegram_code)
 		#self.readTelegramMessages()

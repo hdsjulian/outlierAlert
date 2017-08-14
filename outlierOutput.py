@@ -20,6 +20,7 @@ class outlierOutput(object):
 		self.cursor = (self.conn.cursor())
 		self.telegram_offset = self.getTelegramOffset()
 		self.telegram_users = self.fetchTelegramUsers()
+		self.logger.debug("Telegram users: "+", ".join(str([x for x in self.telegram_users])))
 		self.telegramSubscriptions = self.fetchTelegramSubscriptions()
 		self.bot = telepot.Bot(config.telegram_code)
 		#self.readTelegramMessages()
@@ -64,10 +65,11 @@ class outlierOutput(object):
 				self.logger.debug(str(product_color_id)+" sizes the same"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
 				return False
 			else: 
+
 				self.logger.debug(str(product_color_id)+" size different"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
 				return [[item for item in sizes if item not in cPickle.loads(str(result[0]))], [item for item in cPickle.loads(str(result[0])) if item not in sizes]]
 		else: 
-			return [sizes, sizes]
+			return [sizes, []]
 
 	def addProductColorSizes(self, product, color_id, sizes):
 		product_color_id = self.getProductColorId(product.product_id, color_id)
@@ -83,7 +85,7 @@ class outlierOutput(object):
 					return False
 				self.conn.commit()
 			if len(sizeDifference[0])>0:
-				self.logger.debug(("should send size notification"))
+				self.logger.debug(("should send size notification "+", ".join(sizeDifference[0]))+" instead of "+", ".join(sizeDifference[1]))
 				self.telegramSizeNotification(product, color_id, sizeDifference[0])
 			if len(sizeDifference[1])>0:
 				self.logger.debug("Less stock than new for "+product.name)

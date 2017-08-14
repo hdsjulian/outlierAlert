@@ -276,7 +276,7 @@ class outlierOutput(object):
 			self.telegramSubscriptions[user_id].remove(size)
 
 	def telegramSendSubscriptionData(self, user_id):
-		self.logger.debug("Sending subscribtion data to "+str(user_id))
+		self.logger.debug("Sending subscription data to "+str(user_id))
 		if 'all' in self.telegramSubscriptions[user_id]:
 			self.bot.sendMessage(user_id, "You are currently subscribed to messages for all sizes. to unsubscribe send /unsize all")
 		else: 

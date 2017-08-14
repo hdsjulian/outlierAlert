@@ -141,6 +141,7 @@ class outlierOutput(object):
 		else: 
 			price_message = "Price Change!"
 		for telegram_user in self.telegram_users:
+			self.logger.debug("Sending Price notification to "+str(telegram_user))
 			self.bot.sendMessage(telegram_user, price_message+'\nObject: '+product_name+"\nProductID"+str(product_id)+"\nColor: "+color_name+"\nSizes: "+", ".join(sizes)+"\nPrice: "+str(newprice)+"instead of "+str(oldprice))
 	
 	def telegramProductNotification(self, product):
@@ -148,6 +149,7 @@ class outlierOutput(object):
 		for v in product.color_size_price.itervalues():
 			color_size_price_string = color_size_price_string+"\nColor: "+v['color']+"\nPrice: "+v['price']+"\nSizes: "+', '.join(v["sizes"])
 		for telegram_user in self.telegram_users:
+			self.logger.debug("Sending product notification to "+str(telegram_user))
 			self.bot.sendMessage(telegram_user, "New Product!\nProduct ID:"+str(product.product_id)+"\nProduct Name: "+product.name+"\nDescription:\n"+product.description+"\n"+color_size_price_string)
 
 	def telegramSizeNotification(self, product, color_id, sizeDifference):
@@ -231,6 +233,7 @@ class outlierOutput(object):
 
 /sizes - list all your size subscriptions
 		"""
+		self.logger.debug("Help called by "+str(user_id))
 		self.bot.sendMessage(user_id, helpMessage)
 
 	def telegramAddSizeSubscription(self, user_id, size):
@@ -238,6 +241,7 @@ class outlierOutput(object):
 			query = 'UPDATE telegram_users SET allsizes = 1 WHERE user_id = {user_id}'.format(user_id=user_id)
 			self.cursor.execute(query)
 			self.conn.commit()
+			self.logger.debug("Subscribe all by "+str(user_id))
 			self.bot.sendMessage(user_id, "You subscribed to all sizes. To unsubscribe send /unsize all")
 			self.telegramSubscriptions[user_id] = ['all']
 		else: 
@@ -247,6 +251,7 @@ class outlierOutput(object):
 				query = 'INSERT INTO telegram_user_sizes (user_id, size) VALUES ({user_id}, "{size}")'.format(user_id=user_id, size=size.upper())
 				self.cursor.execute(query)
 				self.conn.commit()
+				self.logger.debug("Size subscribed Size: "+size+" User: "+str(user_id))
 				self.bot.sendMessage(user_id, "Size "+size+" subscribed. To unsubscribe send /unsize [size]")
 				self.telegramSubscriptions[user_id].append(size)
 			else: 
@@ -259,16 +264,19 @@ class outlierOutput(object):
 			query = 'UPDATE telegram_users SET allsizes = 0 WHERE user_id = {user_id}'.format(user_id=user_id)
 			self.cursor.execute(query)
 			self.conn.commit()
+			self.logger.debug ("User "+str(user_id)+" unsubscribed all" )
 			self.bot.sendMessage(user_id, "You unsubscribed from receiving messages for all sizes. To subscribe to individual sizes send /size [size]")
 		else: 
 			query = "DELETE FROM telegram_user_sizes WHERE user_id ={user_id} AND size = {size}".format(user_id=user_id, size=size.upper())
 			self.cursor.execute(query)
 			self.conn.commit()
+			self.logger.debug("User "+str(user_id)+" unsubscribed "+size)
 			self.bot.sendMessage(user_id, "You will no longer receive restock notifications for size "+size)
 		if size in self.telegramSubscriptions[user_id]:
 			self.telegramSubscriptions[user_id].remove(size)
 
 	def telegramSendSubscriptionData(self, user_id):
+		self.logger.debug("Sending subscribtion data to "+str(user_id))
 		if 'all' in self.telegramSubscriptions[user_id]:
 			self.bot.sendMessage(user_id, "You are currently subscribed to messages for all sizes. to unsubscribe send /unsize all")
 		else: 
@@ -306,6 +314,7 @@ class outlierOutput(object):
 		self.cursor.execute(query)
 		self.conn.commit()
 		self.telegram_users.append(user_id)
+		self.logger.debug("Subscribing Telegram user "+str(user_id))
 		self.bot.sendMessage(user_id, "Subscribed! To Unsubscribe send a message with /unsubscribe. For Help send a message with /help")
 
 	def fetchTelegramSubscriptions(self):

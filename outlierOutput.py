@@ -142,7 +142,7 @@ class outlierOutput(object):
 			price_message = "Price Change!"
 		for telegram_user in self.telegram_users:
 			self.logger.debug("Sending Price notification to "+str(telegram_user))
-			self.bot.sendMessage(telegram_user, price_message+'\nObject: '+product_name+"\nProductID"+str(product_id)+"\nColor: "+color_name+"\nSizes: "+", ".join(sizes)+"\nPrice: "+str(newprice)+"instead of "+str(oldprice))
+			self.bot.sendMessage(telegram_user, price_message+'\nObject: '+product_name+"\nProductID"+str(product_id)+"\nColor: "+color_name+"\nSizes: "+", ".join(sizes)+"\nPrice: "+str(newprice)+" instead of "+str(oldprice))
 	
 	def telegramProductNotification(self, product):
 		color_size_price_string = ""

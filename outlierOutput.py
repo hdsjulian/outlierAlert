@@ -150,7 +150,7 @@ class outlierOutput(object):
 			color_size_price_string = color_size_price_string+"\nColor: "+v['color']+"\nPrice: "+v['price']+"\nSizes: "+', '.join(v["sizes"])
 		for telegram_user in self.telegram_users:
 			self.logger.debug("Sending product notification to "+str(telegram_user))
-			self.bot.sendMessage(telegram_user, "New Product!\nProduct ID:"+str(product.product_id)+"\nProduct Name: "+product.name+"\nDescription:\n"+product.description+"\n"+color_size_price_string)
+			self.bot.sendMessage(telegram_user, "New Product!\nProduct ID:"+str(product.product_id)+"\nProduct Name: "+product.name+"\nProduct URL: "+product.url+"\nDescription:\n"+product.description+"\n"+color_size_price_string)
 
 	def telegramSizeNotification(self, product, color_id, sizeDifference):
 		if product.new is False:

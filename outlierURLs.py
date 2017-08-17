@@ -14,37 +14,47 @@ class outlierURLs(object):
 		self.DISCONTINUED_URL = "https://shop.outlier.nyc/shop/retail/discontinued"
 		self.WTF_BOTTOM_URL = "https://shop.outlier.nyc/shop/retail/wtf-bottom.html"
 		self.WTF_TOP_URL = "https://shop.outlier.nyc/shop/retail/wtf-top-pack.html"
-		self.schedule = {}
+		self.schedule = []
 		self.urls = {}
-		self.urls['overview'] = [self.PANTS_URL, self.SHIRTS_URL, self.LAYERS_URL, self.OBJECTS_URL, self.DISCONTINUED_URL, "https://shop.outlier.nyc/shop/retail/experiment-033-paper-nylon-tote.html", "https://shop.outlier.nyc/shop/retail/experiment-034-ultrahigh-waterfall-system.html"]
+		self.urls['overview'] = [self.PANTS_URL, self.SHIRTS_URL, self.LAYERS_URL, self.OBJECTS_URL, self.DISCONTINUED_URL]
 		self.urls['wtf'] = {self.WTF_TOP_URL, self.WTF_BOTTOM_URL}
-		self.schedule['wtf'] = {
+		self.schedule.append({
+			'type': 'wtf',
 			'day_of_week':['Tue','Wed', 'Thu'], 
 			'time_begin':17, 
 			'time_end':23,
 			'frequency': 60
-		}
-		self.schedule['products'] = {
+		})
+		self.schedule.append({
+			'type': 'products',
 			'day_of_week':['Tue', 'Thu'], 
 			'time_begin':17, 
 			'time_end':23,
 			'frequency': 600
-		}
-		self.schedule['restock'] = {
+		})
+		self.schedule.append({
+			'type':'restock',
 			'day_of_week':['Tue', 'Thu'], 
 			'time_begin':17, 
 			'time_end':23,
 			'frequency': 600
-		}
+		})
+		self.schedule.append({
+			'type':'restock',
+			'day_of_week':['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], 
+			'time_begin':1, 
+			'time_end':23,
+			'frequency': 7200
+		})
 
 	def checkSchedule(self, lasttime):
 		now = localtime()
 		actionlist = []
 		frequency = 1000
-		for scheduletype, scheduledata in self.schedule.iteritems():
+		for scheduledata in self.schedule:
 			frequency = scheduledata['frequency'] if frequency > scheduledata['frequency'] else frequency
-			if (strftime('%a', now) in scheduledata['day_of_week'] and int(strftime('%H', now)) >= scheduledata['time_begin'] and int(strftime('%H', now)) < scheduledata['time_end'] and time() > lasttime[scheduletype]+scheduledata['frequency']-1) or lasttime[scheduletype] == 0:
-				actionlist.append(scheduletype)
+			if (strftime('%a', now) in scheduledata['day_of_week'] and int(strftime('%H', now)) >= scheduledata['time_begin'] and int(strftime('%H', now)) < scheduledata['time_end'] and time() > lasttime[scheduledata['type']]+scheduledata['frequency']-1) or lasttime[scheduledata['type']] == 0:
+				actionlist.append(scheduledata['type'])
 
 
 		return actionlist, frequency
@@ -52,18 +62,23 @@ class outlierURLs(object):
 
 	def getLastTime(self, time):
 		lasttime = {}
-		for scheduletype in self.schedule.iterkeys():
-			lasttime[scheduletype] = time
+		for scheduledata in self.schedule:
+			lasttime[scheduledata['type']] = time
 		return lasttime
 	def getProducts(self):
 		products = []
 		for url in self.urls['overview']:
-			products = self.parseOverview(url, products)
+			try: 
+				products = self.parseOverview(url, products)
+			except: 
+				pass
 		return products
 
 		return returnproducts
+
 	def getWTF(self):
 		return [{'product_id':6325, 'url':self.WTF_TOP_URL}, {'product_id':6361, 'url':self.WTF_BOTTOM_URL}]
+
 	def parseOverview(self, url, product_list):
 		url_count = 0
 		warning_match="shop_post_title"

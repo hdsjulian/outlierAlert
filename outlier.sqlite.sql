@@ -1,9 +1,14 @@
 BEGIN TRANSACTION;
-CREATE TABLE `telegram_users` (
+CREATE TABLE "telegram_users" (
 	`id`	INTEGER,
 	`user_name`	INTEGER,
 	`user_id`	INTEGER,
+	`allsizes`	INTEGER,
 	PRIMARY KEY(`id`)
+);
+CREATE TABLE `telegram_user_sizes` (
+	`user_id`	INTEGER,
+	`size`	TEXT
 );
 CREATE TABLE "telegram_offset" (
 	`offset`	INTEGER
@@ -38,6 +43,8 @@ CREATE TABLE "Product" (
 	`introduction`	TEXT,
 	`URL`	TEXT,
 	`discontinued`	INTEGER,
+	`story`	TEXT,
+	`description`	TEXT,
 	PRIMARY KEY(`product_id`)
 );
 COMMIT;

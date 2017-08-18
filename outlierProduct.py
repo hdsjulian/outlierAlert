@@ -4,10 +4,12 @@ class outlierProduct(object):
 		if inproduct:
 			if 'product_id' in inproduct.keys():
 				self.product_id = inproduct['product_id']
+
 			if 'url' in inproduct.keys():
 				self.url = inproduct['url']
 			if 'image_url' in inproduct.keys():
 				self.image_url = inproduct['image_url']
+
 		self.name = ""
 		self.color_size_price = {}
 		self.minPrice = 0
@@ -67,6 +69,9 @@ class outlierProduct(object):
 			self.addColor(color_key, "")
 		self.color_size_price[color_key]["sizes"].append(size)
 
+	def setFormURL(self, formURL):
+		self.formURL = formURL+"/?related_product=&qty=1&"
+
 	def getSizes(self, color_key):
 		return self.color_size_price[color_key]["sizes"]	
 
@@ -93,6 +98,8 @@ class outlierProduct(object):
 			if pricechange:
 				if int(pricechange) != int(color['price']):
 					self.output.telegramPriceNotification(self.product_id, self.name, color['color'], pricechange, color['price'], color['sizes'])
+			else: 
+				print 'no price change'
 			sizechange = self.output.addProductColorSizes(self, color_key, color['sizes'])
 
 

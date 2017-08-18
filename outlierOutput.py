@@ -62,10 +62,9 @@ class outlierOutput(object):
 		result = self.cursor.fetchone()
 		if result: 
 			if cPickle.loads(str(result[0])) == sizes:
-				#self.logger.debug(str(product_color_id)+" sizes the same"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
+				self.logger.debug(str(product_color_id)+" sizes the same"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
 				return False
 			else: 
-
 				self.logger.debug(str(product_color_id)+" size different"+', '.join(cPickle.loads(str(result[0])))+" vs "+', '.join(sizes))
 				return [[item for item in sizes if item not in cPickle.loads(str(result[0]))], [item for item in cPickle.loads(str(result[0])) if item not in sizes]]
 		else: 
@@ -82,6 +81,8 @@ class outlierOutput(object):
 				try: 
 					self.cursor.execute(query)
 				except Exception as e:
+					print "EXCEPTION FUCKERS"
+					print e
 					return False
 				self.conn.commit()
 			if len(sizeDifference[0])>0:
@@ -152,16 +153,59 @@ class outlierOutput(object):
 			self.logger.debug("Sending product notification to "+str(telegram_user))
 			self.bot.sendMessage(telegram_user, "New Product!\nProduct ID:"+str(product.product_id)+"\nProduct Name: "+product.name+"\nProduct URL: "+product.url+"\nDescription:\n"+product.description+"\n"+color_size_price_string)
 
-	def telegramSizeNotification(self, product, color_id, sizeDifference):
+	def telegramSizeNotification(self, product, color_id, sizeDifference):		
 		if product.new is False:
 			for telegram_user in self.telegram_users:
+				formURL = self.updateFormURLs(product, color_id, sizeDifference, telegram_user)
 				if list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference)) or 'all' in self.telegramSubscriptions[telegram_user]:
 					self.logger.debug("Sent Restock to "+str(telegram_user)+" for "+product.name+" in Color: "+product.color_size_price[color_id]["color"]+" Sizes: "+", ".join(sizeDifference))
-					self.bot.sendMessage(telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference))
+					self.bot.sendMessage(telegram_user, "Restock!\n"+product.name+" in Color: "+product.color_size_price[color_id]["color"]+"\nSizes: "+", ".join(sizeDifference)+"\n Order URLS: \n"+formURL)
 				else: 
 					self.logger.debug("User "+str(telegram_user)+" does not want size notification for sizes"+', '.join(sizeDifference)+" Subscriptions:"+', '.join(self.telegramSubscriptions[telegram_user]))
 
-
+	def updateFormURLs(self, product, color_id, sizeDifference, telegram_user):
+		returnURL = ""
+		print list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference))
+		print self.telegramSubscriptions[telegram_user]
+		print sizeDifference
+		if 'all' in self.telegramSubscriptions[telegram_user]:
+			sizeIntersection = sizeDifference
+		else: 
+			sizeIntersection = list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference))
+		for size in sizeIntersection:
+			print size
+			print "was macht der da"
+			print self.telegramSubscriptions[telegram_user]
+			formURL = product.formURL
+			if size == 'all':
+				continue
+			elif size == "28": 
+				formURL = formURL+"super_attribute%5B158%5D=235&"
+			elif size == "29": 
+				formURL = formURL+"super_attribute%5B158%5D=236&"
+			elif size == "30": 
+				formURL = formURL+"super_attribute%5B158%5D=237&"								
+			elif size == "31": 
+				formURL = formURL+"super_attribute%5B158%5D=238&"
+			elif size == "32": 
+				formURL = formURL+"super_attribute%5B158%5D=239&"
+			elif size == "33": 
+				formURL = formURL+"super_attribute%5B158%5D=240&"
+			elif size == "34": 
+				formURL = formURL+"super_attribute%5B158%5D=241&"
+			elif size == "35": 
+				formURL = formURL+"super_attribute%5B158%5D=242&"
+			elif size == "36": 
+				formURL = formURL+"super_attribute%5B158%5D=243&"
+			elif size == "37": 
+				formURL = formURL+"super_attribute%5B158%5D=244&"
+			elif size == "38": 
+				formURL = formURL+"super_attribute%5B158%5D=245&"
+			formURL = formURL+"super_attribute%5B157%5D="+str(color_id)
+			returnURL = "URL for size "+size+" "+formURL+" \n"
+		return returnURL
+								
+								
 	def readTelegramMessages(self):
 		response = self.bot.getUpdates(offset=self.telegram_offset+1)
 		offset = self.telegram_offset
@@ -338,5 +382,5 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		#telegram_users = [111127184]
+		telegram_users = [111127184]
 		return telegram_users

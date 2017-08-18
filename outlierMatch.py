@@ -13,6 +13,7 @@ class outlierMatch(object):
 		self.patterns["story_body_pattern_1"] = "<dd>(.*)"
 		self.patterns["story_body_pattern_2"] = "(.*)</dd>"
 		self.patterns["story_body_pattern_3"] = "<dd>(.*)</dd>"
+		self.patterns['form_url'] = "<form action=\"(.*?)\""
 		self.strip_html = re.compile('<.*?>')
 		self.storymatch = 0
 		self.story = ""
@@ -31,7 +32,9 @@ class outlierMatch(object):
 				self.matchSize(utf8line, product)
 				self.matchDescription(utf8line, product)
 				self.matchStory(utf8line, product)
-		except: 
+				self.matchFormURL(utf8line, product)
+		except Exception as e: 
+			print e
 			pass
 
 	def matchColor(self, line, product):
@@ -62,6 +65,11 @@ class outlierMatch(object):
 		match_description = re.search(self.patterns["description"], line)
 		if match_description:
 			product.setDescription(match_description.group(1))
+	def matchFormURL(self, line, product):
+		matchformurl = re.search(self.patterns['form_url'], line)
+		if matchformurl:
+			print matchformurl.group(1)
+			product.setFormURL(matchformurl.group(1))
 	def matchStory(self, line, product):
 		match_story_headline = re.search(self.patterns["story_headline_pattern"], line)
 		if self.storymatch == 1:

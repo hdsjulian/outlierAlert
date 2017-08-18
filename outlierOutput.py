@@ -173,9 +173,6 @@ class outlierOutput(object):
 		else: 
 			sizeIntersection = list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference))
 		for size in sizeIntersection:
-			print size
-			print "was macht der da"
-			print self.telegramSubscriptions[telegram_user]
 			formURL = product.formURL
 			if size == 'all':
 				continue
@@ -382,5 +379,5 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		telegram_users = [111127184]
+		#telegram_users = [111127184]
 		return telegram_users

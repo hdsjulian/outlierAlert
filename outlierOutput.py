@@ -172,31 +172,41 @@ class outlierOutput(object):
 		else: 
 			sizeIntersection = list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference))
 		formURL = product.formURL
+		returnURL = "" 
 		for size in sizeIntersection:
 			if size == "28": 
-				formURL = formURL+"super_attribute%5B158%5D=235&"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=235&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "29": 
-				formURL = formURL+"super_attribute%5B158%5D=236&"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=236&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "30": 
-				formURL = formURL+"super_attribute%5B158%5D=237&"								
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=237&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "31": 
-				formURL = formURL+"super_attribute%5B158%5D=238&"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=238&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "32": 
-				formURL = formURL+"super_attribute%5B158%5D=239&"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=230&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "33": 
-				formURL = formURL+"super_attribute%5B158%5D=240&"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=240&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "34": 
-				formURL = formURL+"super_attribute%5B158%5D=241&"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=241&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "35": 
-				formURL = formURL+"super_attribute%5B158%5D=242&"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=242&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "36": 
-				formURL = formURL+"super_attribute%5B158%5D=243&"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=243&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "37": 
-				formURL = formURL+"super_attribute%5B158%5D=244&"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=244&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "38": 
-				formURL = formURL+"super_attribute%5B158%5D=245&"
-			formURL = formURL+"super_attribute%5B157%5D="+str(color_id)
-			returnURL = "URL for size "+size+" "+formURL+" \n"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=245&super_attribute%5B157%5D="+str(color_id)+" \n"
+			elif size == "XS":
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=389&super_attribute%5B146%5D="+str(color_id)+" \n"
+			elif size == "S":
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=390&super_attribute%5B146%5D="+str(color_id)+" \n"
+			elif size == "M":
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=392&super_attribute%5B146%5D="+str(color_id)+" \n"
+			elif size == "L":
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=394&super_attribute%5B146%5D="+str(color_id)+" \n"
+			elif size == "XL":
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=396&super_attribute%5B146%5D="+str(color_id)+" \n"
+		print returnURL
 		return returnURL
 								
 								
@@ -376,5 +386,5 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		#telegram_users = [111127184]
+		telegram_users = [111127184]
 		return telegram_users

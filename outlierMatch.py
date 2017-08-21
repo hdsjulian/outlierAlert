@@ -1,4 +1,5 @@
 import re
+import logging
 class outlierMatch(object):
 	def __init__(self, page):
 		self.page = page
@@ -19,6 +20,7 @@ class outlierMatch(object):
 		self.story = ""
 		self.story_ongoing = 0
 		self.linecount = 0
+		self.logger = logging.getLogger('outlier')
 
 	def matchPage(self, product):
 		try: 
@@ -34,7 +36,7 @@ class outlierMatch(object):
 				self.matchStory(utf8line, product)
 				self.matchFormURL(utf8line, product)
 		except Exception as e: 
-			print e
+			self.logger.debug(str(e))
 			pass
 
 	def matchColor(self, line, product):
@@ -68,7 +70,6 @@ class outlierMatch(object):
 	def matchFormURL(self, line, product):
 		matchformurl = re.search(self.patterns['form_url'], line)
 		if matchformurl:
-			print matchformurl.group(1)
 			product.setFormURL(matchformurl.group(1))
 	def matchStory(self, line, product):
 		match_story_headline = re.search(self.patterns["story_headline_pattern"], line)
@@ -76,7 +77,6 @@ class outlierMatch(object):
 			match_story_1 = re.search(self.patterns["story_body_pattern_1"], line)
 			match_story_3 = re.search(self.patterns["story_body_pattern_3"], line)
 			if match_story_1:
-				
 				self.story = re.sub("<br>", "\n", match_story_1.group(1))
 				self.story = re.sub(self.strip_html, '', self.story)
 				self.story_ongoing = 1

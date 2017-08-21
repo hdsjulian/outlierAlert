@@ -30,8 +30,9 @@ def checkProduct(product, f):
 	page = False
 	try: 
 		page = urllib2.urlopen(product.getURL())
-	except: 
+	except Exception as e: 
 		logger.debug("URL could not be opened "+product.getURL())
+		logger.debug(e)
 	if page: 
 		f.write(product.getURL()+'\n\n')
 		match = outlierMatch(page)

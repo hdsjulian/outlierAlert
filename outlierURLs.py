@@ -46,7 +46,6 @@ class outlierURLs(object):
 			'time_end':23,
 			'frequency': 7200
 		})
-
 	def checkSchedule(self, lasttime):
 		now = localtime()
 		actionlist = []

@@ -81,8 +81,7 @@ class outlierOutput(object):
 				try: 
 					self.cursor.execute(query)
 				except Exception as e:
-					print "EXCEPTION FUCKERS"
-					print e
+					self.logger.debug(str(e))
 					return False
 				self.conn.commit()
 			if len(sizeDifference[0])>0:
@@ -106,6 +105,7 @@ class outlierOutput(object):
 			self.cursor.execute(query)
 			self.conn.commit()
 		except Exception as e: 
+			self.logger.debug(str(e))
 			pass
 
 	def getProductColorId(self, product_id, color_id):
@@ -116,6 +116,7 @@ class outlierOutput(object):
 			return result[0]
 		else: 
 			return False
+
 	def addProductColorPrice(self, product_id, color_id, price):
 		product_color_id = self.getProductColorId(product_id, color_id)
 		if product_color_id:
@@ -127,6 +128,7 @@ class outlierOutput(object):
 				try: 
 					self.cursor.execute(query)
 				except Exception as e: 
+					self.logger.debug(str(e))
 					pass
 			self.conn.commit()
 			if oldprice:
@@ -165,18 +167,13 @@ class outlierOutput(object):
 
 	def updateFormURLs(self, product, color_id, sizeDifference, telegram_user):
 		returnURL = ""
-		print list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference))
-		print self.telegramSubscriptions[telegram_user]
-		print sizeDifference
 		if 'all' in self.telegramSubscriptions[telegram_user]:
 			sizeIntersection = sizeDifference
 		else: 
 			sizeIntersection = list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference))
+		formURL = product.formURL
 		for size in sizeIntersection:
-			formURL = product.formURL
-			if size == 'all':
-				continue
-			elif size == "28": 
+			if size == "28": 
 				formURL = formURL+"super_attribute%5B158%5D=235&"
 			elif size == "29": 
 				formURL = formURL+"super_attribute%5B158%5D=236&"

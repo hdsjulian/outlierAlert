@@ -197,15 +197,15 @@ class outlierOutput(object):
 			elif size == "38": 
 				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=245&super_attribute%5B157%5D="+str(color_id)+" \n"
 			elif size == "XS":
-				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=389&super_attribute%5B146%5D="+str(color_id)+" \n"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B146%5D=389&super_attribute%5B147%5D="+str(color_id)+" \n"
 			elif size == "S":
-				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=390&super_attribute%5B146%5D="+str(color_id)+" \n"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B146%5D=390&super_attribute%5B147%5D="+str(color_id)+" \n"
 			elif size == "M":
-				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=392&super_attribute%5B146%5D="+str(color_id)+" \n"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B146%5D=392&super_attribute%5B147%5D="+str(color_id)+" \n"
 			elif size == "L":
-				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=394&super_attribute%5B146%5D="+str(color_id)+" \n"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B146%5D=394&super_attribute%5B147%5D="+str(color_id)+" \n"
 			elif size == "XL":
-				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B147%5D=396&super_attribute%5B146%5D="+str(color_id)+" \n"
+				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B146%5D=396&super_attribute%5B147%5D="+str(color_id)+" \n"
 		print returnURL
 		return returnURL
 								

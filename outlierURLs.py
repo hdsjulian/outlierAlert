@@ -21,7 +21,7 @@ class outlierURLs(object):
 		self.schedule.append({
 			'type': 'wtf',
 			'day_of_week':['Mon', 'Tue','Wed', 'Thu', 'Fri'], 
-			'time_begin':17, 
+			'time_begin':16, 
 			'time_end':23,
 			'frequency': 60
 		})

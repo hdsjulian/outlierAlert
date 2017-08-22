@@ -68,4 +68,5 @@ while True:
 	now = time.time()
 	lasttime = now
 	sleeptime = nexttime-now if nexttime-now > 0 else 1
+	print "sleeping for "+str(sleeptime)
 	time.sleep(sleeptime)

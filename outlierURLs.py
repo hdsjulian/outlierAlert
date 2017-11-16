@@ -15,10 +15,11 @@ class outlierURLs(object):
 		self.DISCONTINUED_URL = "https://shop.outlier.nyc/shop/retail/discontinued"
 		self.WTF_BOTTOM_URL = "https://shop.outlier.nyc/shop/retail/wtf-bottom.html"
 		self.WTF_TOP_URL = "https://shop.outlier.nyc/shop/retail/wtf-top-pack.html"
+		self.DNB_URL = "https://shop.outlier.nyc/shop/retail/do-not-buy-this-pack.html"
 		self.schedule = []
 		self.urls = {}
 		self.urls['overview'] = [self.PANTS_URL, self.SHIRTS_URL, self.LAYERS_URL, self.OBJECTS_URL, self.DISCONTINUED_URL, self.EXPERIMENTS_URL]
-		self.urls['wtf'] = {self.WTF_TOP_URL, self.WTF_BOTTOM_URL}
+		self.urls['wtf'] = {self.WTF_TOP_URL, self.WTF_BOTTOM_URL, self.DNB_URL}
 		self.schedule.append({
 			'type': 'wtf',
 			'day_of_week':['Mon', 'Tue','Wed', 'Thu', 'Fri'], 

@@ -211,34 +211,37 @@ class outlierOutput(object):
 								
 								
 	def readTelegramMessages(self):
-		response = self.bot.getUpdates(offset=self.telegram_offset+1)
-		offset = self.telegram_offset
-		for message in response:
-			if 'message' not in message.iterkeys():
-				continue
-			offset = int(message['update_id'])
-			user_id = int(message['message']['chat']['id'])
-			if 'username' in message['message']['chat'].keys():
-				user_name = message['message']['chat']['username']
-			elif 'last_name' in message['message']['chat'] and 'first_name' in message['message']['chat']:
-				user_name = message['message']['chat']['first_name']+' '+message['message']['chat']['last_name']
-			elif 'last_name' in message['message']['chat']:
-				user_name = mmessage['message']['chat']['last_name']
-			elif 'first_name' in message['message']['chat']:
-				user_name = message['message']['chat']['first_name']
-			else:
-				user_name = 'Unknown'
+		try: 
+			response = self.bot.getUpdates(offset=self.telegram_offset+1)
+			offset = self.telegram_offset
+			for message in response:
+				if 'message' not in message.iterkeys():
+					continue
+				offset = int(message['update_id'])
+				user_id = int(message['message']['chat']['id'])
+				if 'username' in message['message']['chat'].keys():
+					user_name = message['message']['chat']['username']
+				elif 'last_name' in message['message']['chat'] and 'first_name' in message['message']['chat']:
+					user_name = message['message']['chat']['first_name']+' '+message['message']['chat']['last_name']
+				elif 'last_name' in message['message']['chat']:
+					user_name = mmessage['message']['chat']['last_name']
+				elif 'first_name' in message['message']['chat']:
+					user_name = message['message']['chat']['first_name']
+				else:
+					user_name = 'Unknown'
 
 
-			if message['message']['text'] == "/subscribe":
-				if user_id not in self.telegram_users:
-					self.addTelegramUser(user_id, user_name)
-			elif message['message']['text'] == "/unsubscribe":
-				if user_id in self.telegram_users:
-					self.delTelegramUser(user_id)
-			elif user_id in self.telegram_users: 
-				self.parseTelegramMessage(message)
-			self.saveTelegramOffset(offset)
+				if message['message']['text'] == "/subscribe":
+					if user_id not in self.telegram_users:
+						self.addTelegramUser(user_id, user_name)
+				elif message['message']['text'] == "/unsubscribe":
+					if user_id in self.telegram_users:
+						self.delTelegramUser(user_id)
+				elif user_id in self.telegram_users: 
+					self.parseTelegramMessage(message)
+				self.saveTelegramOffset(offset)
+		except: 
+			pass
 	
 	def parseTelegramMessage(self, message):
 		patterns = {}
@@ -386,5 +389,5 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		#telegram_users = [111127184]
+		telegram_users = [111127184]
 		return telegram_users

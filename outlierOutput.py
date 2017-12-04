@@ -325,13 +325,13 @@ class outlierOutput(object):
 	
 	def telegramToggleRedditSubscription(self, user_id, toggle):
 		if toggle == "on":
-			query 'UPDATE telegram_users SET reddit = 1 WHERE user_id = {user_id}'.format(user_id=user_id)
+			query "UPDATE telegram_users SET reddit = 1 WHERE user_id = {user_id}".format(user_id=user_id)
 			self.cursor.execute(query)
 			self.conn.commit()
 			self.logger.debug("Reddit subscription on by"+str(user_id))
 			self.bot.sendMessage(user_id, "You subscribed to notifications about new posts to /r/outliermarket. To unsubscribe send /reddit off")
 		else if toggle == "off"
-			query 'UPDATE telegram_users SET reddit = 0 WHERE user_id = {user_id}'.format(user_id=user_id)
+			query "UPDATE telegram_users SET reddit = 0 WHERE user_id = {user_id}".format(user_id=user_id)
 			self.cursor.execute(query)
 			self.conn.commit()
 			self.logger.debug("Reddit subscription off by"+str(user_id))

@@ -266,7 +266,7 @@ class outlierOutput(object):
 					self.telegramSendSubscriptionData(user_id)
 				elif patternName == 'ping':
 					self.telegramSendPing(user_id)
-				elif patternName == 'reddit'
+				elif patternName == 'reddit':
 					self.telegramToggleRedditSubscription(user_id, match.group[1])
 
 

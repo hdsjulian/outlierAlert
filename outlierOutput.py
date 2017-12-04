@@ -287,6 +287,11 @@ class outlierOutput(object):
 /size (or unsize) one - subscribe/unsubscribe all restock notifications for one-size items
 
 /sizes - list all your size subscriptions
+
+/ping check if this bot is on
+
+/reddit on - turn on reddit notifications for /r/outliermarket
+/reddit off - turn off reddit notifications for /r/outliermarket
 		"""
 		self.logger.debug("Help called by "+str(user_id))
 		self.bot.sendMessage(user_id, helpMessage)
@@ -333,7 +338,7 @@ class outlierOutput(object):
 			self.bot.sendMessage(user_id, "You unsubscribed from reddit notifications. To resubscribes send /reddit on")
 		else:
 			self.bot.sendMessage(user_id, "Command not understood. send \"/reddit on\" or \"/reddit off\"")
-			
+
 	def telegramDeleteSizeSubscription(self, user_id, size):
 		if size == 'all':
 			self.logger.debug("unsize all called")

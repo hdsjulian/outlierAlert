@@ -253,7 +253,6 @@ class outlierOutput(object):
 		patterns['ping'] = "/ping"
 		patterns['reddit'] = '\/reddit ([a-zA-Z0-9]+)'
 		for patternName, pattern in patterns.iteritems():
-
 			match = re.search(pattern,message['message']['text'])
 			if match: 
 				if patternName == 'sizesubscription':
@@ -267,7 +266,7 @@ class outlierOutput(object):
 				elif patternName == 'ping':
 					self.telegramSendPing(user_id)
 				elif patternName == 'reddit':
-					self.telegramToggleRedditSubscription(user_id, match.group[1])
+					self.telegramToggleRedditSubscription(user_id, match.group(1))
 
 
 	def telegramSendHelpMessage(self, user_id):

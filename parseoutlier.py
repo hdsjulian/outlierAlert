@@ -5,6 +5,7 @@ from outlierProduct import outlierProduct
 from outlierMatch import outlierMatch
 from outlierOutput import outlierOutput
 from outlierURLs import outlierURLs
+from outlierReddit import outlierReddit
 from pprint import pprint
 import time
 from datetime import datetime
@@ -20,6 +21,7 @@ logger.setLevel(logging.DEBUG)
 output = outlierOutput()
 URLs = outlierURLs(output, 1)
 schedule_lasttime = URLs.getLastTime(0)
+reddit = outlierReddit(output)
 
 lasttime = time.time()
 #products = URLs.getProducts()
@@ -46,6 +48,7 @@ while True:
 		f = open('outlier.log', "ab")
 		f.write(str(datetime.now())+": "+task+" called\n")
 		schedule_lasttime[task] = time.time()
+		reddit.checkSubmissions()
 		if task == 'restock':
 			print 'restock called'
 			products = output.getProducts()

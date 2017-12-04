@@ -44,8 +44,6 @@ class outlierOutput(object):
 			returnproducts.append({'product_id':line[0], 'url':line[1]})
 		return returnproducts
 
-
-
 	def addProduct(self, product):
 		query = 'INSERT INTO product (product_id, product_name, introduction, URL, story, description) VALUES(?, ?, ?, ?, ?, ?)'
 		try: 
@@ -252,6 +250,7 @@ class outlierOutput(object):
 		patterns['sizes'] = "\/sizes"
 		patterns['unsubscribe'] = "/unsubscribe"
 		patterns['subscribe'] = "/subscribe"
+		patterns['ping'] = "/ping"
 		for patternName, pattern in patterns.iteritems():
 
 			match = re.search(pattern,message['message']['text'])
@@ -264,6 +263,8 @@ class outlierOutput(object):
 					self.telegramSendHelpMessage(user_id)
 				elif patternName == 'sizes':
 					self.telegramSendSubscriptionData(user_id)
+				elif patternName == 'ping':
+					self.telegramSendPing(user_id)
 
 
 	def telegramSendHelpMessage(self, user_id):
@@ -286,6 +287,12 @@ class outlierOutput(object):
 		"""
 		self.logger.debug("Help called by "+str(user_id))
 		self.bot.sendMessage(user_id, helpMessage)
+
+	def telegramSendPing(self, user_id):
+		pingMessage = "I'm up and working"
+		self.logger.debug("Ping called by"+str(user_id))
+		self.bot.sendMessage(user_id, helpMessage)
+
 
 	def telegramAddSizeSubscription(self, user_id, size):
 		if size == 'all':
@@ -338,13 +345,14 @@ class outlierOutput(object):
 				size_message = size_message+"\nSize: "+line[0]
 			self.bot.sendMessage(user_id, "You are currently subscribed to restock notifications for the following sizes:"+size_message)
 
+
 	def getTelegramOffset(self):
-		query = "SELECT offset FROM telegram_offset"
+		query = "SELECT telegram_offset FROM settings"
 		self.cursor.execute(query)
 		return self.cursor.fetchone()[0]
 
 	def saveTelegramOffset(self, offset):
-		query = "UPDATE telegram_offset SET offset = {new_offset} WHERE offset = {offset}".format(new_offset = offset, offset=self.telegram_offset)
+		query = "UPDATE settings SET telegram_offset = {new_offset} WHERE offset = {offset}".format(new_offset = offset, offset=self.telegram_offset)
 		self.cursor.execute(query)
 		self.conn.commit()
 		self.telegram_offset = offset
@@ -391,3 +399,19 @@ class outlierOutput(object):
 			telegram_users.append(line[0])	
 		#telegram_users = [111127184]
 		return telegram_users
+
+	def getRedditTime(self):
+		query = "SELECT post_time FROM reddit_posts order by post_time DESC"
+		self.cursor.execute(query)
+		return self.cursor.fetchone()[0]
+
+	def saveRedditPost(self, title, time):
+		query  = "INSERT INTO reddit_posts (post_title, post_time) VALUES(\"{title}\", {time})".format(title=title, time=time)
+		self.cursor.execute(query)
+		self.conn.commit()
+		self.logger.debug("Sending title "+str(title))
+		query = 'SELECT user_id, reddit FROM telegram_users'
+		self.cursor.execute(query)
+		for line in self.cursor.fetchall():
+			if line[1] == 1:
+				self.bot.sendMessage(line[0], "New Post in /r/outliermarket, Title: "+title)

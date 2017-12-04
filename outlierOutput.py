@@ -251,6 +251,7 @@ class outlierOutput(object):
 		patterns['unsubscribe'] = "/unsubscribe"
 		patterns['subscribe'] = "/subscribe"
 		patterns['ping'] = "/ping"
+		patterns['reddit'] = '\/reddit ([a-zA-Z0-9]+)'
 		for patternName, pattern in patterns.iteritems():
 
 			match = re.search(pattern,message['message']['text'])
@@ -265,6 +266,8 @@ class outlierOutput(object):
 					self.telegramSendSubscriptionData(user_id)
 				elif patternName == 'ping':
 					self.telegramSendPing(user_id)
+				elif patternName == 'reddit'
+					self.telegramToggleRedditSubscription(user_id, match.group[1])
 
 
 	def telegramSendHelpMessage(self, user_id):
@@ -314,8 +317,23 @@ class outlierOutput(object):
 				self.telegramSubscriptions[user_id].append(size)
 			else: 
 				self.bot.sendMessage(user_id, "You already subscribed to size "+size)
-
-
+	
+	def telegramToggleRedditSubscription(self, user_id, toggle):
+		if toggle = "on":
+			query 'UPDATE telegram_users SET reddit = 1 WHERE user_id = {user_id}'.format(user_id=user_id)
+			self.cursor.execute(query)
+			self.conn.commit()
+			self.logger.debug("Reddit subscription on by"+str(user_id))
+			self.bot.sendMessage(user_id, "You subscribed to notifications about new posts to /r/outliermarket. To unsubscribe send /reddit off")
+		else if toggle = "off"
+			query 'UPDATE telegram_users SET reddit = 0 WHERE user_id = {user_id}'.format(user_id=user_id)
+			self.cursor.execute(query)
+			self.conn.commit()
+			self.logger.debug("Reddit subscription off by"+str(user_id))
+			self.bot.sendMessage(user_id, "You unsubscribed from reddit notifications. To resubscribes send /reddit on")
+		else:
+			self.bot.sendMessage(user_id, "Command not understood. send \"/reddit on\" or \"/reddit off\"")
+			
 	def telegramDeleteSizeSubscription(self, user_id, size):
 		if size == 'all':
 			self.logger.debug("unsize all called")

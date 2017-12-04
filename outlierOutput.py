@@ -375,7 +375,7 @@ class outlierOutput(object):
 		return self.cursor.fetchone()[0]
 
 	def saveTelegramOffset(self, offset):
-		query = "UPDATE settings SET telegram_offset = {new_offset} WHERE offset = {offset}".format(new_offset = offset, offset=self.telegram_offset)
+		query = "UPDATE settings SET telegram_offset = {new_offset} WHERE telegram_offset = {offset}".format(new_offset = offset, offset=self.telegram_offset)
 		self.cursor.execute(query)
 		self.conn.commit()
 		self.telegram_offset = offset

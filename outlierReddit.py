@@ -1,13 +1,14 @@
 import praw
 import time
 import pprint
+import config as config
 
 lasttime = time.time()
 
 class outlierReddit(object):
 	def __init__(self, output):
 		self.output = output
-		self.reddit = praw.Reddit(client_id="p6hLVrsRObt_1g", redirect_uri='http://localhost:8080', client_secret="0EPMfNaVu16S5rfxBJp8ZJE8Qls", password="stuh2s", username="hdsjulian", user_agent="testingthis")
+		self.reddit = praw.Reddit(settings.client_id, redirect_uri='http://localhost:8080', settings.client_secret, settings.password, settings.username, settings.user_agent)
 		self.subreddit = self.reddit.subreddit("outliermarket")
 		self.time = output.getRedditTime()
 		print self.time

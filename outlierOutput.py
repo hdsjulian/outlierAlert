@@ -419,18 +419,22 @@ class outlierOutput(object):
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		#telegram_users = [111127184]
+		telegram_users = [111127184]
 		return telegram_users
 
 	def getRedditTime(self):
 		query = "SELECT post_time FROM reddit_posts order by post_time DESC"
 		self.cursor.execute(query)
+		print "reddit time"
+		print self.cursor.fetchone()[0]
 		return self.cursor.fetchone()[0]
 
 	def saveRedditPost(self, title, time):
+		print "saveRedditPost called"
 		query  = "INSERT INTO reddit_posts (post_title, post_time) VALUES(\"{title}\", {time})".format(title=title, time=time)
 		self.cursor.execute(query)
 		self.conn.commit()
+		print "sending title"+str(title)
 		self.logger.debug("Sending title "+str(title))
 		query = 'SELECT user_id, reddit FROM telegram_users'
 		self.cursor.execute(query)

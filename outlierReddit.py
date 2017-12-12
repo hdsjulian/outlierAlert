@@ -17,4 +17,4 @@ class outlierReddit(object):
 		for submission in self.subreddit.submissions(start=self.time):
 			print "submission"
 			print submission.title
-			self.output.saveRedditPost(submission.title, int(submission.created))
+			self.output.saveRedditPost(submission.title.encode('utf-8').strip(), int(submission.created))

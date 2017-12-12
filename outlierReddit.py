@@ -14,7 +14,10 @@ class outlierReddit(object):
 		print self.time
 	def checkSubmissions(self):
 		print "checking submissions"
-		for submission in self.subreddit.submissions(start=self.time):
-			print "submission"
-			print submission.title
-			self.output.saveRedditPost(submission.title.encode('utf-8').strip(), int(submission.created))
+		try:
+			for submission in self.subreddit.submissions(start=self.time):
+				print "submission"
+				print submission.title
+				self.output.saveRedditPost(submission.title.encode('utf-8').strip(), int(submission.created))
+		except:
+			pass

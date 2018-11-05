@@ -9,6 +9,8 @@ import logging
 #todo: make addproduct more elegant
 #todo product color sizes is broken
 #todo: create populateProduct method
+#todo produkt uebergeben statt einzelne parameter
+#todo subscription auf wtf und products statt restocks
 #was passiert: ich guck nur ob was dazu kam. speicher aber nicht wenns weggging
 
 
@@ -170,7 +172,9 @@ class outlierOutput(object):
 		else: 
 			sizeIntersection = list(set(self.telegramSubscriptions[telegram_user]) & set(sizeDifference))
 		formURL = product.formURL
-		returnURL = "" 
+		returnURL = "URL: "+product.url 
+		return returnURL
+		"""	
 		for size in sizeIntersection:
 			if size == "28": 
 				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B158%5D=235&super_attribute%5B157%5D="+str(color_id)+" \n"
@@ -205,9 +209,8 @@ class outlierOutput(object):
 			elif size == "XL":
 				returnURL = returnURL+"URL for size "+size+" "+formURL+"super_attribute%5B146%5D=396&super_attribute%5B147%5D="+str(color_id)+" \n"
 		print returnURL
-		return returnURL
-								
-								
+		"""
+						
 	def readTelegramMessages(self):
 		try: 
 			response = self.bot.getUpdates(offset=self.telegram_offset+1)
@@ -237,6 +240,8 @@ class outlierOutput(object):
 						self.delTelegramUser(user_id)
 				elif user_id in self.telegram_users: 
 					self.parseTelegramMessage(message)
+				else:
+					print "foobarwarum"
 				self.saveTelegramOffset(offset)
 		except: 
 			pass
@@ -250,28 +255,41 @@ class outlierOutput(object):
 		patterns['sizes'] = "\/sizes"
 		patterns['unsubscribe'] = "/unsubscribe"
 		patterns['subscribe'] = "/subscribe"
-		patterns['ping'] = "/ping"
+		patterns['ping'] = "\/ping"
 		patterns['reddit'] = '\/reddit ([a-zA-Z0-9]+)'
-		for patternName, pattern in patterns.iteritems():
+		patterns['id'] = "\/id ([a-zA-Z0-9]+)"
+		patterns['search'] = "\/search ([a-zA-Z0-9]+)"
+
+		print "patternmatching"
+		print "message"
+		print message['message']['text']
+ 		for patternName, pattern in patterns.iteritems():
 			match = re.search(pattern,message['message']['text'])
 			if match: 
 				if patternName == 'sizesubscription':
 					self.telegramAddSizeSubscription(user_id, match.group(1))
 				elif patternName == 'sizeunsubscription':
-					self.telegramDeleteSizeSubscription(user_id, match.group(1))
+					self.telegramDeleteSizeSubscription
 				elif patternName == 'help':
 					self.telegramSendHelpMessage(user_id)
+				elif patternName == 'search':
+					print "search gefunden"
+					self.telegramSearch(user_id, match.group(1))
 				elif patternName == 'sizes':
 					self.telegramSendSubscriptionData(user_id)
 				elif patternName == 'ping':
 					self.telegramSendPing(user_id)
 				elif patternName == 'reddit':
 					self.telegramToggleRedditSubscription(user_id, match.group(1))
+				elif patternName =='id': 
+					self.telegramSendProductID(user_id, match.group(1))
+
+
 
 
 	def telegramSendHelpMessage(self, user_id):
 		helpMessage = """Use following commands:
-/help - Receive this list
+/help - Receive this listt
 
 /size [size] - Subscribe to restock notifications for a size
 
@@ -289,6 +307,10 @@ class outlierOutput(object):
 
 /ping check if this bot is on
 
+/id find out Product ID for a search term
+
+/product ID = subscribe to product restock notifications for that ID
+
 /reddit on - turn on reddit notifications for /r/outliermarket
 /reddit off - turn off reddit notifications for /r/outliermarket
 		"""
@@ -298,7 +320,20 @@ class outlierOutput(object):
 	def telegramSendPing(self, user_id):
 		pingMessage = "I'm up and working"
 		self.logger.debug("Ping called by"+str(user_id))
-		self.bot.sendMessage(user_id, helpMessage)
+		self.bot.sendMessage(user_id, pingMessage)
+
+	def telegramSendProductID(self, user_id, pattern):
+		query = "SELECT product_id, product_name FROM Product WHERE product_name LIKE '%{pattern}%'".format(pattern=pattern)
+		returnMessage = "Product IDs found for {pattern} \n".format(pattern=pattern)
+		self.cursor.execute(query)
+		self.conn.commit()
+		for line in self.cursor.fetchall():
+			print "found"
+			returnMessage = returnMessage+"\n Product Name:"+str(line[1])+"\n Product ID:"+str(line[0])+"\n"
+		self.bot.sendMessage(user_id, returnMessage)
+
+	
+
 
 
 	def telegramAddSizeSubscription(self, user_id, size):
@@ -413,13 +448,36 @@ class outlierOutput(object):
 				telegramSubscriptions[line[0]].append('all')
 		return telegramSubscriptions
 
+	def telegramSearch(self, user_id, search):
+		query = 'SELECT product_id, product_name FROM product where product_name LIKE \'%{search}%\''.format(search=search)
+		print query
+		self.cursor.execute(query)
+
+		print "foo"
+		returnMessage = ""
+		for line in self.cursor.fetchall():
+			print "line found"
+			print line[0]
+			print line[1]
+			returnMessage = returnMessage+"\n\n ID: "+str(line[0])+" Product Name "+str(line[1])
+			print "killed"
+
+		print returnMessage
+		print "message"
+		if returnMessage == "":
+			print "sending nothing"
+			self.bot.sendMessage(user_id, "No products found matching \""+search+"\"!")
+		else: 
+			print "sending someething"
+			self.bot.sendMessage(user_id, "Products found!\n\n"+returnMessage)
+
 	def fetchTelegramUsers(self):
 		query = "SELECT user_id FROM telegram_users"
 		self.cursor.execute(query)
 		telegram_users = []
 		for line in self.cursor.fetchall():
 			telegram_users.append(line[0])	
-		#telegram_users = [111127184]
+		
 		return telegram_users
 
 	def getRedditTime(self):
